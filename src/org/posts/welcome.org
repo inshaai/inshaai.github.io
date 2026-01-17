@@ -5,17 +5,5 @@
 
 * Welcome to InshaAI
 
-Welcome to *InshaAI*. This site is a space where I publish structured notes, essays, and explorations at the intersection of statistics, artificial intelligence, mathematics, and computer science. The goal is not only to share results, but also to document the thinking, derivations, and workflows behind them in a clear and reusable way.
+Welcome to *InshaAI*. This site is a space where I publish my written work including structured notes and essays. Many posts will grow out of personal notes, lectures, or experiments, refined into standalone articles.
 
-Alongside technical topics, I will also write about tools that shape how I work—particularly Emacs, Org-mode, and Linux-based workflows. Many posts will grow out of personal notes, lectures, or experiments, refined into standalone articles that emphasize clarity, rigor, and long-term usefulness.
-
-InshaAI is intentionally minimal and evolving. Content will expand over time, and posts may be revised as ideas mature. If you are interested in careful explanations, from-first-principles approaches, and practical workflows for learning and research, this site is meant for you.
-
-#+BEGIN_SRC python :results output
-import numpy as np
-
-def print_hw():
-    print("Welcome to InshaAI")
-
-print_hw()
-#+END_SRC
