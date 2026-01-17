@@ -59,7 +59,7 @@ function renderIndex() {
 
   app.innerHTML = `
     <section class="card">
-      <h1 class="h1">Blog</h1>
+      <h1 class="h1">Articales</h1>
       <p class="muted">Posts</p>
       <div class="hr"></div>
 
