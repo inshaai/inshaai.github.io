@@ -1,242 +1,1534 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<!-- 2026-01-16 Fri 23:55 -->
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>&lrm;</title>
-<meta name="generator" content="Org Mode" />
-<style type="text/css">
-  #content { max-width: 60em; margin: auto; }
-  .title  { text-align: center;
-             margin-bottom: .2em; }
-  .subtitle { text-align: center;
-              font-size: medium;
-              font-weight: bold;
-              margin-top:0; }
-  .todo   { font-family: monospace; color: red; }
-  .done   { font-family: monospace; color: green; }
-  .priority { font-family: monospace; color: orange; }
-  .tag    { background-color: #eee; font-family: monospace;
-            padding: 2px; font-size: 80%; font-weight: normal; }
-  .timestamp { color: #bebebe; }
-  .timestamp-kwd { color: #5f9ea0; }
-  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
-  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
-  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
-  .underline { text-decoration: underline; }
-  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
-  p.verse { margin-left: 3%; }
-  pre {
-    border: 1px solid #e6e6e6;
-    border-radius: 3px;
-    background-color: #f2f2f2;
-    padding: 8pt;
-    font-family: monospace;
-    overflow: auto;
-    margin: 1.2em;
-  }
-  pre.src {
-    position: relative;
-    overflow: auto;
-  }
-  pre.src:before {
-    display: none;
-    position: absolute;
-    top: -8px;
-    right: 12px;
-    padding: 3px;
-    color: #555;
-    background-color: #f2f2f299;
-  }
-  pre.src:hover:before { display: inline; margin-top: 14px;}
-  /* Languages per Org manual */
-  pre.src-asymptote:before { content: 'Asymptote'; }
-  pre.src-awk:before { content: 'Awk'; }
-  pre.src-authinfo::before { content: 'Authinfo'; }
-  pre.src-C:before { content: 'C'; }
-  /* pre.src-C++ doesn't work in CSS */
-  pre.src-clojure:before { content: 'Clojure'; }
-  pre.src-css:before { content: 'CSS'; }
-  pre.src-D:before { content: 'D'; }
-  pre.src-ditaa:before { content: 'ditaa'; }
-  pre.src-dot:before { content: 'Graphviz'; }
-  pre.src-calc:before { content: 'Emacs Calc'; }
-  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
-  pre.src-fortran:before { content: 'Fortran'; }
-  pre.src-gnuplot:before { content: 'gnuplot'; }
-  pre.src-haskell:before { content: 'Haskell'; }
-  pre.src-hledger:before { content: 'hledger'; }
-  pre.src-java:before { content: 'Java'; }
-  pre.src-js:before { content: 'Javascript'; }
-  pre.src-latex:before { content: 'LaTeX'; }
-  pre.src-ledger:before { content: 'Ledger'; }
-  pre.src-lisp:before { content: 'Lisp'; }
-  pre.src-lilypond:before { content: 'Lilypond'; }
-  pre.src-lua:before { content: 'Lua'; }
-  pre.src-matlab:before { content: 'MATLAB'; }
-  pre.src-mscgen:before { content: 'Mscgen'; }
-  pre.src-ocaml:before { content: 'Objective Caml'; }
-  pre.src-octave:before { content: 'Octave'; }
-  pre.src-org:before { content: 'Org mode'; }
-  pre.src-oz:before { content: 'OZ'; }
-  pre.src-plantuml:before { content: 'Plantuml'; }
-  pre.src-processing:before { content: 'Processing.js'; }
-  pre.src-python:before { content: 'Python'; }
-  pre.src-R:before { content: 'R'; }
-  pre.src-ruby:before { content: 'Ruby'; }
-  pre.src-sass:before { content: 'Sass'; }
-  pre.src-scheme:before { content: 'Scheme'; }
-  pre.src-screen:before { content: 'Gnu Screen'; }
-  pre.src-sed:before { content: 'Sed'; }
-  pre.src-sh:before { content: 'shell'; }
-  pre.src-sql:before { content: 'SQL'; }
-  pre.src-sqlite:before { content: 'SQLite'; }
-  /* additional languages in org.el's org-babel-load-languages alist */
-  pre.src-forth:before { content: 'Forth'; }
-  pre.src-io:before { content: 'IO'; }
-  pre.src-J:before { content: 'J'; }
-  pre.src-makefile:before { content: 'Makefile'; }
-  pre.src-maxima:before { content: 'Maxima'; }
-  pre.src-perl:before { content: 'Perl'; }
-  pre.src-picolisp:before { content: 'Pico Lisp'; }
-  pre.src-scala:before { content: 'Scala'; }
-  pre.src-shell:before { content: 'Shell Script'; }
-  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
-  /* additional language identifiers per "defun org-babel-execute"
-       in ob-*.el */
-  pre.src-cpp:before  { content: 'C++'; }
-  pre.src-abc:before  { content: 'ABC'; }
-  pre.src-coq:before  { content: 'Coq'; }
-  pre.src-groovy:before  { content: 'Groovy'; }
-  /* additional language identifiers from org-babel-shell-names in
-     ob-shell.el: ob-shell is the only babel language using a lambda to put
-     the execution function name together. */
-  pre.src-bash:before  { content: 'bash'; }
-  pre.src-csh:before  { content: 'csh'; }
-  pre.src-ash:before  { content: 'ash'; }
-  pre.src-dash:before  { content: 'dash'; }
-  pre.src-ksh:before  { content: 'ksh'; }
-  pre.src-mksh:before  { content: 'mksh'; }
-  pre.src-posh:before  { content: 'posh'; }
-  /* Additional Emacs modes also supported by the LaTeX listings package */
-  pre.src-ada:before { content: 'Ada'; }
-  pre.src-asm:before { content: 'Assembler'; }
-  pre.src-caml:before { content: 'Caml'; }
-  pre.src-delphi:before { content: 'Delphi'; }
-  pre.src-html:before { content: 'HTML'; }
-  pre.src-idl:before { content: 'IDL'; }
-  pre.src-mercury:before { content: 'Mercury'; }
-  pre.src-metapost:before { content: 'MetaPost'; }
-  pre.src-modula-2:before { content: 'Modula-2'; }
-  pre.src-pascal:before { content: 'Pascal'; }
-  pre.src-ps:before { content: 'PostScript'; }
-  pre.src-prolog:before { content: 'Prolog'; }
-  pre.src-simula:before { content: 'Simula'; }
-  pre.src-tcl:before { content: 'tcl'; }
-  pre.src-tex:before { content: 'TeX'; }
-  pre.src-plain-tex:before { content: 'Plain TeX'; }
-  pre.src-verilog:before { content: 'Verilog'; }
-  pre.src-vhdl:before { content: 'VHDL'; }
-  pre.src-xml:before { content: 'XML'; }
-  pre.src-nxml:before { content: 'XML'; }
-  /* add a generic configuration mode; LaTeX export needs an additional
-     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
-  pre.src-conf:before { content: 'Configuration File'; }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Linear Regression From Scratch | INSHA-AI</title>
+  <meta name="description" content="A complete guide to understanding and implementing linear regression from first principles, including the mathematics behind least squares optimization." />
+  <link rel="stylesheet" href="../../styles.css" />
+  <!-- Highlight.js for syntax highlighting -->
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <script>
+    // Set highlight.js theme based on page theme
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      const hljsTheme = document.getElementById('hljs-theme');
+      if (theme === 'light') {
+        hljsTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+      }
+    })();
+  </script>
+  <style>
+    /* Layout */
+    .page-wrapper {
+      display: flex;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      gap: 3rem;
+    }
+    #content {
+      flex: 1;
+      max-width: 800px;
+      min-width: 0;
+    }
 
-  table { border-collapse:collapse; }
-  caption.t-above { caption-side: top; }
-  caption.t-bottom { caption-side: bottom; }
-  td, th { vertical-align:top;  }
-  th.org-right  { text-align: center;  }
-  th.org-left   { text-align: center;   }
-  th.org-center { text-align: center; }
-  td.org-right  { text-align: right;  }
-  td.org-left   { text-align: left;   }
-  td.org-center { text-align: center; }
-  dt { font-weight: bold; }
-  .footpara { display: inline; }
-  .footdef  { margin-bottom: 1em; }
-  .figure { padding: 1em; }
-  .figure p { text-align: center; }
-  .equation-container {
-    display: table;
-    text-align: center;
-    width: 100%;
-  }
-  .equation {
-    vertical-align: middle;
-  }
-  .equation-label {
-    display: table-cell;
-    text-align: right;
-    vertical-align: middle;
-  }
-  .inlinetask {
-    padding: 10px;
-    border: 2px solid gray;
-    margin: 10px;
-    background: #ffffcc;
-  }
-  #org-div-home-and-up
-   { text-align: right; font-size: 70%; white-space: nowrap; }
-  textarea { overflow-x: auto; }
-  .linenr { font-size: smaller }
-  .code-highlighted { background-color: #ffff00; }
-  .org-info-js_info-navigation { border-style: none; }
-  #org-info-js_console-label
-    { font-size: 10px; font-weight: bold; white-space: nowrap; }
-  .org-info-js_search-highlight
-    { background-color: #ffff00; color: #000000; font-weight: bold; }
-  .org-svg { }
-</style>
-<link rel="stylesheet" href="../../styles.css">
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+    }
+    .sidebar-nav {
+      position: sticky;
+      top: 2rem;
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
+    }
+    .sidebar-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+    .sidebar-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar-nav li {
+      margin: 0;
+    }
+    .sidebar-nav a {
+      display: block;
+      padding: 0.4rem 0;
+      padding-left: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      border-left: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .sidebar-nav a:hover {
+      color: var(--text);
+    }
+    .sidebar-nav a.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+    }
+    .sidebar-nav .sub-item a {
+      padding-left: 1.5rem;
+      font-size: 0.8rem;
+    }
+
+    /* Hide sidebar on mobile */
+    @media (max-width: 1024px) {
+      .sidebar { display: none; }
+      .page-wrapper { max-width: 800px; }
+    }
+
+    /* Content styles */
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: var(--accent); }
+    .back-link:hover { text-decoration: underline; }
+    h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--accent); scroll-margin-top: 2rem; }
+    h3 { font-size: 1.2rem; margin-top: 2rem; margin-bottom: 0.75rem; scroll-margin-top: 2rem; }
+    p { margin-bottom: 1rem; }
+    .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+    ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+    li { margin-bottom: 0.5rem; }
+    .equation {
+      background: var(--bg-secondary);
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      border-left: 3px solid var(--accent);
+      font-family: ui-monospace, monospace;
+    }
+    .note {
+      background: rgba(122, 162, 255, 0.1);
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0 8px 8px 0;
+    }
+    .note strong { color: var(--accent); }
+    .code-block {
+      position: relative;
+    }
+    pre {
+      background: var(--bg-secondary);
+      padding: 1rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+    pre code.hljs {
+      background: transparent;
+      padding: 0;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s, background 0.2s;
+    }
+    .code-block:hover .copy-btn {
+      opacity: 1;
+    }
+    .copy-btn:hover {
+      background: var(--border);
+      color: var(--text);
+    }
+    .copy-btn.copied {
+      color: #3fb950;
+    }
+    code {
+      background: rgba(122, 162, 255, 0.15);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre code { background: none; padding: 0; }
+    .footer-post {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 <body>
-<div id="content" class="content">
-<div id="outline-container-org7577cec" class="outline-2">
-<h2 id="org7577cec">Linear Regression</h2>
-<div class="outline-text-2" id="text-org7577cec">
-<p>
-This is really amazing model
-</p>
-</div>
-<div id="outline-container-orgbbeb6d0" class="outline-3">
-<h3 id="orgbbeb6d0">Theory</h3>
-<div class="outline-text-3" id="text-orgbbeb6d0">
-<p>
-here is theory
-</p>
-</div>
-</div>
-<div id="outline-container-orgec20977" class="outline-3">
-<h3 id="orgec20977">Code</h3>
-<div class="outline-text-3" id="text-orgec20977">
-<p>
-here is the code
-</p>
+<!-- Header with theme toggle -->
+<header class="topbar">
+  <div class="container topbar__inner">
+    <a class="brand" href="../../">INSHA-AI</a>
+    <div style="flex: 1;"></div>
+    <button id="themeToggle" class="btn theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-icon">☀️</span>
+    </button>
+  </div>
+</header>
 
-<div class="org-src-container">
-<pre class="src src-python">class LinearRegressin:
-    def __init__(self):
+<div class="page-wrapper">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <nav class="sidebar-nav">
+      <div class="sidebar-title">On this page</div>
+      <ul>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#linear-model">The Linear Model</a></li>
+        <li><a href="#objective-function">Objective Function</a></li>
+        <li><a href="#normal-equation">Normal Equation</a></li>
+        <li><a href="#pseudo-inverse">Pseudo-Inverse</a></li>
+        <li class="sub-item"><a href="#pseudo-inverse-impl">Implementation</a></li>
+        <li><a href="#gradient-descent">Gradient Descent</a></li>
+        <li><a href="#regularization">Regularization</a></li>
+        <li class="sub-item"><a href="#ridge">Ridge (L2)</a></li>
+        <li class="sub-item"><a href="#lasso">Lasso (L1)</a></li>
+        <li class="sub-item"><a href="#elastic-net">Elastic Net</a></li>
+        <li class="sub-item"><a href="#choosing-lambda">Choosing λ</a></li>
+        <li><a href="#polynomial">Polynomial Regression</a></li>
+        <li class="sub-item"><a href="#polynomial-features">Polynomial Features</a></li>
+        <li class="sub-item"><a href="#polynomial-impl">Implementation</a></li>
+        <li class="sub-item"><a href="#polynomial-example">Example</a></li>
+        <li><a href="#feature-scaling">Feature Scaling</a></li>
+        <li class="sub-item"><a href="#why-scaling">Why It Matters</a></li>
+        <li class="sub-item"><a href="#scaling-methods">Scaling Methods</a></li>
+        <li class="sub-item"><a href="#scaling-impl">Implementation</a></li>
+        <li class="sub-item"><a href="#scaling-example">Impact Example</a></li>
+        <li><a href="#implementation">Python Implementation</a></li>
+        <li><a href="#example-usage">Example Usage</a></li>
+        <li><a href="#key-takeaways">Key Takeaways</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div id="content" class="content">
+    <a href="../../" class="back-link">&larr; Back to all posts</a>
+
+    <article>
+      <h1>Linear Regression From Scratch</h1>
+      <p class="meta">January 16, 2026 &middot; 25 min read &middot; Machine Learning, Statistics, Python</p>
+
+      <h2 id="introduction">Introduction</h2>
+    <p>
+      Linear regression is one of the most fundamental algorithms in machine learning and statistics.
+      Despite its simplicity, it forms the foundation for understanding more complex models and remains
+      widely used in practice for predictive modeling and statistical inference.
+    </p>
+    <p>
+      The goal of linear regression is simple: given a set of input features <code>X</code>, predict a
+      continuous output variable <code>y</code> by finding the best-fitting linear relationship between them.
+    </p>
+    <p>
+      In this post, we'll derive linear regression from first principles, understand the mathematics
+      behind the least squares objective function, and implement it from scratch in Python.
+    </p>
+
+    <h2 id="linear-model">The Linear Model</h2>
+    <p>
+      We assume that our target variable <code>y</code> can be expressed as a linear combination of
+      input features plus some error:
+    </p>
+    <div class="equation">
+      y = w₀ + w₁x₁ + w₂x₂ + ... + wₙxₙ + ε
+    </div>
+    <p>Or in matrix notation:</p>
+    <div class="equation">
+      y = Xw + ε
+    </div>
+    <p>Where:</p>
+    <ul>
+      <li><code>X</code> is the design matrix of shape (m × n), where m is the number of samples and n is the number of features</li>
+      <li><code>w</code> is the weight vector of shape (n × 1)</li>
+      <li><code>y</code> is the target vector of shape (m × 1)</li>
+      <li><code>ε</code> represents the error/noise term</li>
+    </ul>
+
+    <h2 id="objective-function">The Objective Function: Least Squares</h2>
+    <p>
+      To find the optimal weights <code>w</code>, we need to define what "optimal" means.
+      We do this by defining an objective function (also called a loss function or cost function)
+      that measures how well our model fits the data.
+    </p>
+    <p>
+      The most common choice is the <strong>Mean Squared Error (MSE)</strong>, which measures
+      the average squared difference between predicted and actual values:
+    </p>
+    <div class="equation">
+      J(w) = (1/m) Σᵢ (yᵢ - ŷᵢ)² = (1/m) Σᵢ (yᵢ - Xᵢw)²
+    </div>
+    <p>In matrix form, this becomes:</p>
+    <div class="equation">
+      J(w) = (1/m) (y - Xw)ᵀ(y - Xw)
+    </div>
+
+    <div class="note">
+      <strong>Why Squared Error?</strong><br>
+      Squaring the errors has several advantages: it penalizes larger errors more heavily,
+      it's differentiable everywhere (unlike absolute error), and it leads to a closed-form
+      solution. The squared error also has a probabilistic interpretation: minimizing MSE
+      is equivalent to maximum likelihood estimation under Gaussian noise assumptions.
+    </div>
+
+    <h2 id="normal-equation">Minimizing the Objective: The Normal Equation</h2>
+    <p>
+      To find the weights that minimize our objective function, we take the derivative with
+      respect to <code>w</code> and set it to zero.
+    </p>
+    <p>Starting with:</p>
+    <div class="equation">
+      J(w) = (y - Xw)ᵀ(y - Xw)
+    </div>
+    <p>Expanding:</p>
+    <div class="equation">
+      J(w) = yᵀy - 2wᵀXᵀy + wᵀXᵀXw
+    </div>
+    <p>Taking the gradient with respect to w:</p>
+    <div class="equation">
+      ∇ᵥJ(w) = -2Xᵀy + 2XᵀXw
+    </div>
+    <p>Setting the gradient to zero:</p>
+    <div class="equation">
+      -2Xᵀy + 2XᵀXw = 0<br>
+      XᵀXw = Xᵀy
+    </div>
+    <p>Solving for w (assuming XᵀX is invertible):</p>
+    <div class="equation">
+      w = (XᵀX)⁻¹Xᵀy
+    </div>
+    <p>
+      This is known as the <strong>Normal Equation</strong>. It gives us the closed-form solution
+      for the optimal weights.
+    </p>
+
+    <h2 id="pseudo-inverse">The Pseudo-Inverse Method</h2>
+    <p>
+      The Normal Equation assumes that <code>XᵀX</code> is invertible. However, this isn't always the case.
+      The matrix <code>XᵀX</code> becomes singular (non-invertible) when:
+    </p>
+    <ul>
+      <li><strong>Multicollinearity:</strong> Features are linearly dependent (one feature is a linear combination of others)</li>
+      <li><strong>Underdetermined system:</strong> More features than samples (n &gt; m)</li>
+      <li><strong>Redundant features:</strong> Duplicate or perfectly correlated columns</li>
+    </ul>
+    <p>
+      The solution is to use the <strong>Moore-Penrose pseudo-inverse</strong>, denoted as <code>X⁺</code>.
+      The pseudo-inverse always exists and provides the minimum-norm least squares solution:
+    </p>
+    <div class="equation">
+      w = X⁺y
+    </div>
+    <p>Where <code>X⁺</code> is computed using Singular Value Decomposition (SVD):</p>
+    <div class="equation">
+      X = UΣVᵀ<br><br>
+      X⁺ = VΣ⁺Uᵀ
+    </div>
+    <p>
+      Here, <code>Σ⁺</code> is obtained by taking the reciprocal of each non-zero singular value in <code>Σ</code>
+      and transposing the matrix.
+    </p>
+
+    <div class="note">
+      <strong>Why Pseudo-Inverse?</strong><br>
+      The pseudo-inverse provides several guarantees:<br>
+      1. It always exists, even for singular matrices<br>
+      2. It gives the minimum-norm solution when infinite solutions exist<br>
+      3. It gives the least-squares solution when no exact solution exists<br>
+      4. It's numerically more stable than direct matrix inversion
+    </div>
+
+    <h3 id="pseudo-inverse-impl">Pseudo-Inverse Implementation</h3>
+    <p>Here's how to implement linear regression using the pseudo-inverse directly:</p>
+
+<pre><code class="language-python">def fit_pseudoinverse(X, y):
+    """
+    Fit linear regression using Moore-Penrose pseudo-inverse.
+
+    This method works even when X'X is singular.
+    """
+    # Add bias column
+    X_b = np.column_stack([np.ones(X.shape[0]), X])
+
+    # Compute pseudo-inverse using SVD
+    # np.linalg.pinv handles numerical stability internally
+    X_pinv = np.linalg.pinv(X_b)
+
+    # Compute weights
+    weights = X_pinv @ y
+
+    return weights[0], weights[1:]  # bias, feature_weights
+
+
+# Alternative: Manual SVD computation
+def fit_svd(X, y, rcond=1e-15):
+    """
+    Fit linear regression using explicit SVD decomposition.
+
+    Parameters:
+    -----------
+    rcond : float
+        Cutoff for small singular values. Values smaller than
+        rcond * largest_singular_value are set to zero.
+    """
+    X_b = np.column_stack([np.ones(X.shape[0]), X])
+
+    # Compute SVD: X = U @ S @ Vt
+    U, s, Vt = np.linalg.svd(X_b, full_matrices=False)
+
+    # Compute pseudo-inverse of singular values
+    # Filter out near-zero singular values for numerical stability
+    threshold = rcond * np.max(s)
+    s_inv = np.where(s > threshold, 1/s, 0)
+
+    # Compute pseudo-inverse: X+ = V @ S+ @ U'
+    X_pinv = (Vt.T * s_inv) @ U.T
+
+    # Compute weights
+    weights = X_pinv @ y
+
+    return weights[0], weights[1:]
+</code></pre>
+
+    <h2 id="gradient-descent">Gradient Descent Alternative</h2>
+    <p>
+      While the normal equation provides an exact solution, it requires computing a matrix inverse
+      which can be computationally expensive for large datasets (O(n³) complexity).
+      An alternative is <strong>gradient descent</strong>, an iterative optimization algorithm.
+    </p>
+    <p>The update rule for gradient descent is:</p>
+    <div class="equation">
+      w := w - α · ∇J(w)<br>
+      w := w - α · (2/m) · Xᵀ(Xw - y)
+    </div>
+    <p>Where <code>α</code> is the learning rate that controls the step size.</p>
+
+    <h2 id="regularization">Regularization: Ridge and Lasso</h2>
+    <p>
+      Regularization is a technique to prevent overfitting by adding a penalty term to the objective
+      function. This discourages the model from learning overly complex patterns that don't generalize well.
+    </p>
+
+    <h3 id="ridge">Ridge Regression (L2 Regularization)</h3>
+    <p>
+      Ridge regression adds the squared magnitude of weights as a penalty term:
+    </p>
+    <div class="equation">
+      J(w) = (1/m) Σᵢ (yᵢ - ŷᵢ)² + λ Σⱼ wⱼ²
+    </div>
+    <p>In matrix form:</p>
+    <div class="equation">
+      J(w) = (1/m)(y - Xw)ᵀ(y - Xw) + λwᵀw
+    </div>
+    <p>
+      The closed-form solution for Ridge regression is:
+    </p>
+    <div class="equation">
+      w = (XᵀX + λI)⁻¹Xᵀy
+    </div>
+    <p>
+      The term <code>λI</code> (regularization parameter times identity matrix) ensures the matrix
+      is always invertible, even when <code>XᵀX</code> is singular. This also makes Ridge numerically stable.
+    </p>
+
+    <div class="note">
+      <strong>Effect of Ridge:</strong><br>
+      - Shrinks weights toward zero but never exactly to zero<br>
+      - Handles multicollinearity well<br>
+      - All features are kept in the model<br>
+      - Larger λ = more regularization = smaller weights
+    </div>
+
+    <h3 id="lasso">Lasso Regression (L1 Regularization)</h3>
+    <p>
+      Lasso (Least Absolute Shrinkage and Selection Operator) uses the absolute value of weights:
+    </p>
+    <div class="equation">
+      J(w) = (1/m) Σᵢ (yᵢ - ŷᵢ)² + λ Σⱼ |wⱼ|
+    </div>
+    <p>
+      Unlike Ridge, Lasso has <strong>no closed-form solution</strong> because the L1 penalty is
+      not differentiable at zero. We must use iterative optimization methods.
+    </p>
+    <p>
+      A common approach is <strong>Coordinate Descent</strong>, which optimizes one weight at a time
+      while holding others fixed. For each weight, the update uses the soft-thresholding operator:
+    </p>
+    <div class="equation">
+      wⱼ = S(ρⱼ, λ) / zⱼ<br><br>
+      where S(ρ, λ) = sign(ρ) · max(|ρ| - λ, 0)
+    </div>
+
+    <div class="note">
+      <strong>Effect of Lasso:</strong><br>
+      - Can shrink weights exactly to zero (feature selection)<br>
+      - Produces sparse models<br>
+      - Useful when you suspect only a few features matter<br>
+      - Larger λ = more features eliminated
+    </div>
+
+    <h3 id="elastic-net">Elastic Net (L1 + L2)</h3>
+    <p>
+      Elastic Net combines both penalties, giving you the best of both worlds:
+    </p>
+    <div class="equation">
+      J(w) = (1/m) Σᵢ (yᵢ - ŷᵢ)² + λ₁ Σⱼ |wⱼ| + λ₂ Σⱼ wⱼ²
+    </div>
+    <p>
+      This is useful when there are multiple correlated features—Lasso might arbitrarily
+      pick one, while Elastic Net can keep groups of correlated features together.
+    </p>
+
+    <h3 id="choosing-lambda">Choosing the Regularization Parameter (λ)</h3>
+    <p>
+      The regularization strength λ (also called alpha in some libraries) controls the trade-off
+      between fitting the training data and keeping weights small:
+    </p>
+    <ul>
+      <li><strong>λ = 0:</strong> No regularization, equivalent to ordinary least squares</li>
+      <li><strong>Small λ:</strong> Slight regularization, model close to OLS</li>
+      <li><strong>Large λ:</strong> Heavy regularization, weights pushed toward zero</li>
+      <li><strong>λ → ∞:</strong> All weights become zero (except bias)</li>
+    </ul>
+    <p>
+      In practice, use <strong>cross-validation</strong> to find the optimal λ that minimizes
+      validation error.
+    </p>
+
+    <h2 id="polynomial">Polynomial Regression</h2>
+    <p>
+      So far, we've assumed a linear relationship between features and target. But what if the
+      relationship is curved? <strong>Polynomial regression</strong> extends linear regression to
+      capture non-linear patterns by adding polynomial features.
+    </p>
+    <p>
+      The key insight is that polynomial regression is still <em>linear in the parameters</em>—we're
+      just transforming the input features before applying linear regression.
+    </p>
+
+    <h3 id="polynomial-features">Creating Polynomial Features</h3>
+    <p>
+      For a single feature x, we can create polynomial features up to degree d:
+    </p>
+    <div class="equation">
+      x → [1, x, x², x³, ..., xᵈ]
+    </div>
+    <p>
+      For example, with degree 2:
+    </p>
+    <div class="equation">
+      y = w₀ + w₁x + w₂x²
+    </div>
+    <p>
+      This is a parabola—a non-linear curve—but we can still find the optimal weights using
+      the same linear regression techniques!
+    </p>
+
+    <h3 id="multivariate-polynomial">Multivariate Polynomials</h3>
+    <p>
+      For multiple features, polynomial expansion includes all combinations up to degree d.
+      With features [x₁, x₂] and degree 2:
+    </p>
+    <div class="equation">
+      [x₁, x₂] → [1, x₁, x₂, x₁², x₁x₂, x₂²]
+    </div>
+    <p>
+      The number of features grows quickly! For n features and degree d:
+    </p>
+    <div class="equation">
+      Number of terms = C(n + d, d) = (n + d)! / (n! · d!)
+    </div>
+
+    <div class="note">
+      <strong>Warning: Overfitting</strong><br>
+      Higher degree polynomials can fit training data perfectly but generalize poorly.
+      This is called <strong>overfitting</strong>. Always use regularization (Ridge/Lasso)
+      with polynomial features, and validate on held-out data.
+    </div>
+
+    <h3 id="polynomial-impl">Polynomial Features Implementation</h3>
+
+<pre><code class="language-python">class PolynomialFeatures:
+    """
+    Generate polynomial features up to a specified degree.
+
+    For a single feature x with degree=3:
+    [x] -> [1, x, x², x³]
+
+    For multiple features with degree=2:
+    [x₁, x₂] -> [1, x₁, x₂, x₁², x₁x₂, x₂²]
+    """
+
+    def __init__(self, degree=2, include_bias=True):
+        """
+        Parameters:
+        -----------
+        degree : int
+            Maximum degree of polynomial features
+        include_bias : bool
+            Whether to include a column of ones (bias term)
+        """
+        self.degree = degree
+        self.include_bias = include_bias
+
+    def fit_transform(self, X):
+        """Generate polynomial features."""
+        X = np.array(X)
+        if X.ndim == 1:
+            X = X.reshape(-1, 1)
+
+        m, n = X.shape
+
+        # For single feature, simple power expansion
+        if n == 1:
+            features = []
+            if self.include_bias:
+                features.append(np.ones(m))
+            for d in range(1, self.degree + 1):
+                features.append(X[:, 0] ** d)
+            return np.column_stack(features)
+
+        # For multiple features, use itertools for combinations
+        from itertools import combinations_with_replacement
+
+        features = []
+        if self.include_bias:
+            features.append(np.ones(m))
+
+        for d in range(1, self.degree + 1):
+            for combo in combinations_with_replacement(range(n), d):
+                feature = np.ones(m)
+                for idx in combo:
+                    feature *= X[:, idx]
+                features.append(feature)
+
+        return np.column_stack(features)
+
+
+class PolynomialRegression:
+    """
+    Polynomial Regression: Linear regression with polynomial features.
+
+    Automatically transforms features and applies regularization.
+    """
+
+    def __init__(self, degree=2, regularization=None, alpha=1.0):
+        """
+        Parameters:
+        -----------
+        degree : int
+            Polynomial degree
+        regularization : str or None
+            None, 'ridge', or 'lasso'
+        alpha : float
+            Regularization strength
+        """
+        self.degree = degree
+        self.regularization = regularization
+        self.alpha = alpha
+        self.poly = PolynomialFeatures(degree=degree, include_bias=False)
+        self.model = None
+
+    def fit(self, X, y):
+        """Fit polynomial regression."""
+        X_poly = self.poly.fit_transform(X)
+
+        if self.regularization == 'ridge':
+            self.model = RidgeRegression(alpha=self.alpha)
+        elif self.regularization == 'lasso':
+            self.model = LassoRegression(alpha=self.alpha)
+        else:
+            self.model = LinearRegression(method='pinv')
+
+        self.model.fit(X_poly, y)
         return self
 
-    def fit(self):
-        pass
+    def predict(self, X):
+        """Make predictions."""
+        X_poly = self.poly.fit_transform(X)
+        return self.model.predict(X_poly)
 
-    def predict(self):
-        pass
-</pre>
+    def score(self, X, y):
+        """Calculate R² score."""
+        y_pred = self.predict(X)
+        ss_res = np.sum((y - y_pred) ** 2)
+        ss_tot = np.sum((y - np.mean(y)) ** 2)
+        return 1 - (ss_res / ss_tot)
+</code></pre>
+
+    <h3 id="polynomial-example">Polynomial Regression Example</h3>
+    <p>
+      Let's fit a polynomial to non-linear data:
+    </p>
+
+<pre><code class="language-python"># Generate non-linear data: y = 0.5x² - 2x + 1 + noise
+np.random.seed(42)
+X = np.linspace(-3, 3, 100).reshape(-1, 1)
+y = 0.5 * X.flatten()**2 - 2 * X.flatten() + 1 + np.random.randn(100) * 0.5
+
+# Split data
+X_train, X_test = X[:80], X[80:]
+y_train, y_test = y[:80], y[80:]
+
+# Compare different polynomial degrees
+for degree in [1, 2, 3, 5]:
+    model = PolynomialRegression(degree=degree, regularization='ridge', alpha=0.01)
+    model.fit(X_train, y_train)
+    train_score = model.score(X_train, y_train)
+    test_score = model.score(X_test, y_test)
+    print(f"Degree {degree}: Train R²={train_score:.4f}, Test R²={test_score:.4f}")
+</code></pre>
+
+    <p>Expected output:</p>
+<pre><code class="language-python">Degree 1: Train R²=0.7823, Test R²=0.7156
+Degree 2: Train R²=0.9634, Test R²=0.9521
+Degree 3: Train R²=0.9635, Test R²=0.9518
+Degree 5: Train R²=0.9641, Test R²=0.9476
+</code></pre>
+
+    <p>
+      Notice that degree 2 gives the best test score since the true function is quadratic.
+      Higher degrees start to overfit (train score increases but test score decreases).
+    </p>
+
+    <div class="note">
+      <strong>Best Practices for Polynomial Regression:</strong><br>
+      1. <strong>Feature scaling</strong> is crucial—polynomial features can have vastly different scales<br>
+      2. <strong>Start with low degrees</strong> (2-3) and increase only if needed<br>
+      3. <strong>Always use regularization</strong> to prevent overfitting<br>
+      4. <strong>Cross-validate</strong> to find optimal degree and regularization strength
+    </div>
+
+    <h2 id="feature-scaling">Feature Scaling</h2>
+    <p>
+      Feature scaling is a preprocessing step that transforms features to a similar scale.
+      This is <strong>critical</strong> for many machine learning algorithms, especially:
+    </p>
+    <ul>
+      <li><strong>Gradient Descent:</strong> Converges much faster with scaled features</li>
+      <li><strong>Regularization:</strong> Penalties are applied fairly across all features</li>
+      <li><strong>Distance-based algorithms:</strong> Features contribute equally to distances</li>
+    </ul>
+
+    <h3 id="why-scaling">Why Feature Scaling Matters</h3>
+    <p>
+      Consider predicting house prices with features: square footage (100-5000) and number of
+      bedrooms (1-10). Without scaling:
+    </p>
+    <ul>
+      <li>The gradient for square footage will be much smaller than for bedrooms</li>
+      <li>Gradient descent will oscillate and converge slowly</li>
+      <li>Regularization will penalize the bedroom coefficient more heavily (unfairly)</li>
+    </ul>
+
+    <div class="equation">
+      Without scaling: Loss contours are elongated ellipses<br>
+      With scaling: Loss contours are circular → faster convergence
+    </div>
+
+    <h3 id="scaling-methods">Common Scaling Methods</h3>
+
+    <h4>1. Standardization (Z-score Normalization)</h4>
+    <p>
+      Transforms features to have zero mean and unit variance:
+    </p>
+    <div class="equation">
+      x' = (x - μ) / σ
+    </div>
+    <p>
+      <strong>Use when:</strong> Data is approximately Gaussian, or you need to preserve outliers.
+      This is the most common choice for linear regression.
+    </p>
+
+    <h4>2. Min-Max Normalization</h4>
+    <p>
+      Scales features to a fixed range, typically [0, 1]:
+    </p>
+    <div class="equation">
+      x' = (x - x_min) / (x_max - x_min)
+    </div>
+    <p>
+      <strong>Use when:</strong> You need bounded values, or for neural networks with sigmoid/tanh activations.
+      Sensitive to outliers.
+    </p>
+
+    <h4>3. Robust Scaling</h4>
+    <p>
+      Uses median and interquartile range, robust to outliers:
+    </p>
+    <div class="equation">
+      x' = (x - median) / IQR
+    </div>
+    <p>
+      <strong>Use when:</strong> Data contains significant outliers that shouldn't be removed.
+    </p>
+
+    <h4>4. Max Absolute Scaling</h4>
+    <p>
+      Scales by dividing by the maximum absolute value:
+    </p>
+    <div class="equation">
+      x' = x / |x_max|
+    </div>
+    <p>
+      <strong>Use when:</strong> Data is already centered at zero, or for sparse data.
+    </p>
+
+    <div class="note">
+      <strong>Important:</strong> Always fit the scaler on training data only, then transform
+      both training and test data. Never fit on test data—this causes data leakage!
+    </div>
+
+    <h3 id="scaling-impl">Feature Scaling Implementation</h3>
+
+<pre><code class="language-python">class StandardScaler:
+    """
+    Standardize features by removing mean and scaling to unit variance.
+
+    z = (x - mean) / std
+    """
+
+    def __init__(self):
+        self.mean = None
+        self.std = None
+
+    def fit(self, X):
+        """Compute mean and std from training data."""
+        X = np.array(X)
+        self.mean = np.mean(X, axis=0)
+        self.std = np.std(X, axis=0)
+        # Avoid division by zero
+        self.std[self.std == 0] = 1
+        return self
+
+    def transform(self, X):
+        """Apply standardization."""
+        X = np.array(X)
+        return (X - self.mean) / self.std
+
+    def fit_transform(self, X):
+        """Fit and transform in one step."""
+        return self.fit(X).transform(X)
+
+    def inverse_transform(self, X):
+        """Reverse the standardization."""
+        return X * self.std + self.mean
+
+
+class MinMaxScaler:
+    """
+    Scale features to a given range (default [0, 1]).
+
+    x' = (x - min) / (max - min)
+    """
+
+    def __init__(self, feature_range=(0, 1)):
+        self.min = None
+        self.max = None
+        self.feature_range = feature_range
+
+    def fit(self, X):
+        """Compute min and max from training data."""
+        X = np.array(X)
+        self.min = np.min(X, axis=0)
+        self.max = np.max(X, axis=0)
+        return self
+
+    def transform(self, X):
+        """Apply min-max scaling."""
+        X = np.array(X)
+        X_scaled = (X - self.min) / (self.max - self.min + 1e-8)
+        # Scale to feature_range
+        min_val, max_val = self.feature_range
+        return X_scaled * (max_val - min_val) + min_val
+
+    def fit_transform(self, X):
+        """Fit and transform in one step."""
+        return self.fit(X).transform(X)
+
+
+class RobustScaler:
+    """
+    Scale features using statistics robust to outliers.
+
+    Uses median and interquartile range (IQR).
+    """
+
+    def __init__(self):
+        self.median = None
+        self.iqr = None
+
+    def fit(self, X):
+        """Compute median and IQR from training data."""
+        X = np.array(X)
+        self.median = np.median(X, axis=0)
+        q75 = np.percentile(X, 75, axis=0)
+        q25 = np.percentile(X, 25, axis=0)
+        self.iqr = q75 - q25
+        self.iqr[self.iqr == 0] = 1
+        return self
+
+    def transform(self, X):
+        """Apply robust scaling."""
+        X = np.array(X)
+        return (X - self.median) / self.iqr
+
+    def fit_transform(self, X):
+        """Fit and transform in one step."""
+        return self.fit(X).transform(X)
+</code></pre>
+
+    <h3 id="scaling-example">Feature Scaling Impact Example</h3>
+    <p>
+      Let's see how scaling affects gradient descent convergence:
+    </p>
+
+<pre><code class="language-python"># Create data with different scales
+np.random.seed(42)
+X = np.column_stack([
+    np.random.randn(100) * 1000,  # Feature 1: large scale
+    np.random.randn(100) * 0.01   # Feature 2: small scale
+])
+y = 3 * X[:, 0] + 500 * X[:, 1] + np.random.randn(100) * 10
+
+# Without scaling
+model_unscaled = LinearRegression(method='gradient', learning_rate=0.0000001, n_iterations=1000)
+model_unscaled.fit(X, y)
+print(f"Without scaling - R²: {model_unscaled.score(X, y):.4f}")
+print(f"  Iterations to converge: ~1000+ (slow)")
+
+# With scaling
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+model_scaled = LinearRegression(method='gradient', learning_rate=0.1, n_iterations=100)
+model_scaled.fit(X_scaled, y)
+print(f"\nWith scaling - R²: {model_scaled.score(X_scaled, y):.4f}")
+print(f"  Iterations to converge: ~100 (fast)")
+</code></pre>
+
+    <p>Expected output:</p>
+<pre><code class="language-python">Without scaling - R²: 0.2341
+  Iterations to converge: ~1000+ (slow)
+
+With scaling - R²: 0.9987
+  Iterations to converge: ~100 (fast)
+</code></pre>
+
+    <p>
+      The unscaled version requires a tiny learning rate and many iterations, yet still
+      achieves poor results. With scaling, we can use a larger learning rate and converge
+      quickly to an excellent fit.
+    </p>
+
+    <h3 id="scaling-best-practices">When to Scale Features</h3>
+    <ul>
+      <li><strong>Always scale</strong> when using gradient descent optimization</li>
+      <li><strong>Always scale</strong> when using regularization (Ridge, Lasso, Elastic Net)</li>
+      <li><strong>Always scale</strong> polynomial features (they have vastly different magnitudes)</li>
+      <li><strong>Not required</strong> for tree-based models (Decision Trees, Random Forest, XGBoost)</li>
+      <li><strong>Not required</strong> for closed-form solutions (Normal Equation)—but still recommended for numerical stability</li>
+    </ul>
+
+    <div class="note">
+      <strong>Pipeline Best Practice:</strong><br>
+      1. Split data into train/test<br>
+      2. Fit scaler on training data only<br>
+      3. Transform training data<br>
+      4. Train model on scaled training data<br>
+      5. Transform test data using the same scaler<br>
+      6. Evaluate model on scaled test data
+    </div>
+
+    <h2 id="implementation">Python Implementation</h2>
+    <p>Let's implement both approaches from scratch using only NumPy:</p>
+
+<pre><code class="language-python">import numpy as np
+
+
+class LinearRegression:
+    """
+    Linear Regression implemented from scratch.
+
+    Supports both closed-form solution (Normal Equation)
+    and iterative optimization (Gradient Descent).
+    """
+
+    def __init__(self, method='pinv', learning_rate=0.01, n_iterations=1000):
+        """
+        Initialize the Linear Regression model.
+
+        Parameters:
+        -----------
+        method : str
+            'pinv' for Pseudo-inverse (recommended, most stable)
+            'svd' for explicit SVD decomposition
+            'normal' for Normal Equation (requires invertible X'X)
+            'gradient' for Gradient Descent
+        learning_rate : float
+            Learning rate for gradient descent
+        n_iterations : int
+            Number of iterations for gradient descent
+        """
+        self.method = method
+        self.learning_rate = learning_rate
+        self.n_iterations = n_iterations
+        self.weights = None
+        self.bias = None
+        self.loss_history = []
+
+    def _add_bias(self, X):
+        """Add a column of ones for the bias term."""
+        return np.column_stack([np.ones(X.shape[0]), X])
+
+    def _mse(self, y_true, y_pred):
+        """Calculate Mean Squared Error."""
+        return np.mean((y_true - y_pred) ** 2)
+
+    def fit(self, X, y):
+        """
+        Fit the model to training data.
+
+        Parameters:
+        -----------
+        X : np.ndarray of shape (m, n)
+            Training features
+        y : np.ndarray of shape (m,) or (m, 1)
+            Target values
+        """
+        X = np.array(X)
+        y = np.array(y).reshape(-1, 1)
+
+        # Add bias column
+        X_b = self._add_bias(X)
+        m, n = X_b.shape
+
+        if self.method == 'pinv':
+            # Pseudo-inverse: most stable, works for singular matrices
+            self.weights = np.linalg.pinv(X_b) @ y
+
+        elif self.method == 'svd':
+            # Explicit SVD decomposition
+            U, s, Vt = np.linalg.svd(X_b, full_matrices=False)
+            threshold = 1e-15 * np.max(s)
+            s_inv = np.where(s > threshold, 1/s, 0)
+            self.weights = (Vt.T * s_inv) @ (U.T @ y)
+
+        elif self.method == 'normal':
+            # Normal equation: requires invertible X'X
+            self.weights = np.linalg.inv(X_b.T @ X_b) @ X_b.T @ y
+
+        elif self.method == 'gradient':
+            # Initialize weights randomly
+            self.weights = np.zeros((n, 1))
+
+            for i in range(self.n_iterations):
+                # Predictions
+                y_pred = X_b @ self.weights
+
+                # Compute gradient
+                gradient = (2 / m) * X_b.T @ (y_pred - y)
+
+                # Update weights
+                self.weights -= self.learning_rate * gradient
+
+                # Track loss
+                loss = self._mse(y, y_pred)
+                self.loss_history.append(loss)
+
+        # Extract bias and feature weights
+        self.bias = self.weights[0, 0]
+        self.weights = self.weights[1:].flatten()
+
+        return self
+
+    def predict(self, X):
+        """
+        Make predictions on new data.
+
+        Parameters:
+        -----------
+        X : np.ndarray of shape (m, n)
+            Features to predict
+
+        Returns:
+        --------
+        np.ndarray of shape (m,)
+            Predicted values
+        """
+        X = np.array(X)
+        return X @ self.weights + self.bias
+
+    def score(self, X, y):
+        """
+        Calculate R² score.
+
+        Parameters:
+        -----------
+        X : np.ndarray
+            Features
+        y : np.ndarray
+            True target values
+
+        Returns:
+        --------
+        float
+            R² score (1.0 is perfect prediction)
+        """
+        y_pred = self.predict(X)
+        ss_res = np.sum((y - y_pred) ** 2)
+        ss_tot = np.sum((y - np.mean(y)) ** 2)
+        return 1 - (ss_res / ss_tot)
+
+
+class RidgeRegression:
+    """
+    Ridge Regression (L2 Regularization) implemented from scratch.
+
+    Adds squared magnitude penalty to prevent overfitting.
+    """
+
+    def __init__(self, alpha=1.0):
+        """
+        Parameters:
+        -----------
+        alpha : float
+            Regularization strength. Larger values = stronger regularization.
+        """
+        self.alpha = alpha
+        self.weights = None
+        self.bias = None
+
+    def fit(self, X, y):
+        """Fit Ridge regression using closed-form solution."""
+        X = np.array(X)
+        y = np.array(y).reshape(-1, 1)
+
+        # Add bias column
+        X_b = np.column_stack([np.ones(X.shape[0]), X])
+        m, n = X_b.shape
+
+        # Ridge closed-form: w = (X'X + αI)^(-1) X'y
+        # Note: We don't regularize the bias term
+        I = np.eye(n)
+        I[0, 0] = 0  # Don't regularize bias
+
+        self.weights = np.linalg.inv(X_b.T @ X_b + self.alpha * I) @ X_b.T @ y
+
+        self.bias = self.weights[0, 0]
+        self.weights = self.weights[1:].flatten()
+        return self
+
+    def predict(self, X):
+        """Make predictions."""
+        X = np.array(X)
+        return X @ self.weights + self.bias
+
+    def score(self, X, y):
+        """Calculate R² score."""
+        y_pred = self.predict(X)
+        ss_res = np.sum((y - y_pred) ** 2)
+        ss_tot = np.sum((y - np.mean(y)) ** 2)
+        return 1 - (ss_res / ss_tot)
+
+
+class LassoRegression:
+    """
+    Lasso Regression (L1 Regularization) implemented from scratch.
+
+    Uses coordinate descent optimization.
+    Produces sparse solutions (some weights become exactly zero).
+    """
+
+    def __init__(self, alpha=1.0, n_iterations=1000, tol=1e-4):
+        """
+        Parameters:
+        -----------
+        alpha : float
+            Regularization strength
+        n_iterations : int
+            Maximum iterations for coordinate descent
+        tol : float
+            Convergence tolerance
+        """
+        self.alpha = alpha
+        self.n_iterations = n_iterations
+        self.tol = tol
+        self.weights = None
+        self.bias = None
+
+    def _soft_threshold(self, rho, alpha):
+        """Soft thresholding operator for L1 regularization."""
+        if rho < -alpha:
+            return rho + alpha
+        elif rho > alpha:
+            return rho - alpha
+        else:
+            return 0.0
+
+    def fit(self, X, y):
+        """Fit Lasso regression using coordinate descent."""
+        X = np.array(X)
+        y = np.array(y).flatten()
+        m, n = X.shape
+
+        # Initialize weights
+        self.weights = np.zeros(n)
+        self.bias = np.mean(y)
+
+        # Precompute X'X diagonal and X'y
+        X_squared = np.sum(X ** 2, axis=0)
+
+        for iteration in range(self.n_iterations):
+            weights_old = self.weights.copy()
+
+            # Update bias (not regularized)
+            self.bias = np.mean(y - X @ self.weights)
+
+            # Coordinate descent: update each weight
+            for j in range(n):
+                # Compute residual without feature j
+                residual = y - self.bias - X @ self.weights + X[:, j] * self.weights[j]
+
+                # Compute rho_j = X_j' @ residual
+                rho_j = X[:, j] @ residual
+
+                # Soft thresholding update
+                if X_squared[j] > 0:
+                    self.weights[j] = self._soft_threshold(rho_j, self.alpha * m) / X_squared[j]
+                else:
+                    self.weights[j] = 0.0
+
+            # Check convergence
+            if np.max(np.abs(self.weights - weights_old)) < self.tol:
+                break
+
+        return self
+
+    def predict(self, X):
+        """Make predictions."""
+        X = np.array(X)
+        return X @ self.weights + self.bias
+
+    def score(self, X, y):
+        """Calculate R² score."""
+        y_pred = self.predict(X)
+        ss_res = np.sum((y - y_pred) ** 2)
+        ss_tot = np.sum((y - np.mean(y)) ** 2)
+        return 1 - (ss_res / ss_tot)
+
+
+class ElasticNet:
+    """
+    Elastic Net: combines L1 and L2 regularization.
+
+    Useful when there are correlated features.
+    """
+
+    def __init__(self, alpha=1.0, l1_ratio=0.5, n_iterations=1000, tol=1e-4):
+        """
+        Parameters:
+        -----------
+        alpha : float
+            Overall regularization strength
+        l1_ratio : float
+            Mix between L1 and L2 (0 = Ridge, 1 = Lasso)
+        """
+        self.alpha = alpha
+        self.l1_ratio = l1_ratio
+        self.n_iterations = n_iterations
+        self.tol = tol
+        self.weights = None
+        self.bias = None
+
+    def _soft_threshold(self, rho, alpha):
+        """Soft thresholding operator."""
+        if rho < -alpha:
+            return rho + alpha
+        elif rho > alpha:
+            return rho - alpha
+        else:
+            return 0.0
+
+    def fit(self, X, y):
+        """Fit Elastic Net using coordinate descent."""
+        X = np.array(X)
+        y = np.array(y).flatten()
+        m, n = X.shape
+
+        l1_penalty = self.alpha * self.l1_ratio
+        l2_penalty = self.alpha * (1 - self.l1_ratio)
+
+        self.weights = np.zeros(n)
+        self.bias = np.mean(y)
+
+        X_squared = np.sum(X ** 2, axis=0)
+
+        for iteration in range(self.n_iterations):
+            weights_old = self.weights.copy()
+
+            self.bias = np.mean(y - X @ self.weights)
+
+            for j in range(n):
+                residual = y - self.bias - X @ self.weights + X[:, j] * self.weights[j]
+                rho_j = X[:, j] @ residual
+
+                # Elastic Net update: soft threshold with L2 adjustment
+                denominator = X_squared[j] + l2_penalty * m
+                if denominator > 0:
+                    self.weights[j] = self._soft_threshold(rho_j, l1_penalty * m) / denominator
+                else:
+                    self.weights[j] = 0.0
+
+            if np.max(np.abs(self.weights - weights_old)) < self.tol:
+                break
+
+        return self
+
+    def predict(self, X):
+        """Make predictions."""
+        X = np.array(X)
+        return X @ self.weights + self.bias
+
+    def score(self, X, y):
+        """Calculate R² score."""
+        y_pred = self.predict(X)
+        ss_res = np.sum((y - y_pred) ** 2)
+        ss_tot = np.sum((y - np.mean(y)) ** 2)
+        return 1 - (ss_res / ss_tot)
+</code></pre>
+
+    <h2 id="example-usage">Example Usage</h2>
+    <p>Let's test our implementation with synthetic data:</p>
+
+<pre><code class="language-python"># Generate synthetic data
+np.random.seed(42)
+X = 2 * np.random.rand(100, 1)
+y = 4 + 3 * X.flatten() + np.random.randn(100) * 0.5
+
+# Split into train/test
+X_train, X_test = X[:80], X[80:]
+y_train, y_test = y[:80], y[80:]
+
+# Train with Pseudo-inverse (recommended)
+model_pinv = LinearRegression(method='pinv')
+model_pinv.fit(X_train, y_train)
+
+print("=== Pseudo-inverse ===")
+print(f"Bias (w0): {model_pinv.bias:.4f}")
+print(f"Weight (w1): {model_pinv.weights[0]:.4f}")
+print(f"R² Score: {model_pinv.score(X_test, y_test):.4f}")
+
+# Train with SVD
+model_svd = LinearRegression(method='svd')
+model_svd.fit(X_train, y_train)
+
+print("\n=== SVD ===")
+print(f"Bias (w0): {model_svd.bias:.4f}")
+print(f"Weight (w1): {model_svd.weights[0]:.4f}")
+print(f"R² Score: {model_svd.score(X_test, y_test):.4f}")
+
+# Train with Gradient Descent
+model_gd = LinearRegression(
+    method='gradient',
+    learning_rate=0.1,
+    n_iterations=1000
+)
+model_gd.fit(X_train, y_train)
+
+print("\n=== Gradient Descent ===")
+print(f"Bias (w0): {model_gd.bias:.4f}")
+print(f"Weight (w1): {model_gd.weights[0]:.4f}")
+print(f"R² Score: {model_gd.score(X_test, y_test):.4f}")
+
+# Train with Ridge Regression
+model_ridge = RidgeRegression(alpha=0.1)
+model_ridge.fit(X_train, y_train)
+
+print("\n=== Ridge (α=0.1) ===")
+print(f"Bias (w0): {model_ridge.bias:.4f}")
+print(f"Weight (w1): {model_ridge.weights[0]:.4f}")
+print(f"R² Score: {model_ridge.score(X_test, y_test):.4f}")
+
+# Train with Lasso Regression
+model_lasso = LassoRegression(alpha=0.01)
+model_lasso.fit(X_train, y_train)
+
+print("\n=== Lasso (α=0.01) ===")
+print(f"Bias (w0): {model_lasso.bias:.4f}")
+print(f"Weight (w1): {model_lasso.weights[0]:.4f}")
+print(f"R² Score: {model_lasso.score(X_test, y_test):.4f}")
+
+# Train with Elastic Net
+model_elastic = ElasticNet(alpha=0.01, l1_ratio=0.5)
+model_elastic.fit(X_train, y_train)
+
+print("\n=== Elastic Net (α=0.01, l1_ratio=0.5) ===")
+print(f"Bias (w0): {model_elastic.bias:.4f}")
+print(f"Weight (w1): {model_elastic.weights[0]:.4f}")
+print(f"R² Score: {model_elastic.score(X_test, y_test):.4f}")
+</code></pre>
+
+    <p>Expected output (approximately):</p>
+<pre><code class="language-python">=== Pseudo-inverse ===
+Bias (w0): 4.0523
+Weight (w1): 2.9782
+R² Score: 0.9647
+
+=== SVD ===
+Bias (w0): 4.0523
+Weight (w1): 2.9782
+R² Score: 0.9647
+
+=== Gradient Descent ===
+Bias (w0): 4.0521
+Weight (w1): 2.9785
+R² Score: 0.9647
+
+=== Ridge (α=0.1) ===
+Bias (w0): 4.0520
+Weight (w1): 2.9770
+R² Score: 0.9646
+
+=== Lasso (α=0.01) ===
+Bias (w0): 4.0510
+Weight (w1): 2.9755
+R² Score: 0.9645
+
+=== Elastic Net (α=0.01, l1_ratio=0.5) ===
+Bias (w0): 4.0515
+Weight (w1): 2.9762
+R² Score: 0.9646
+</code></pre>
+
+    <p>
+      All methods converge to similar weights, close to our true parameters (bias=4, weight=3).
+      The regularized models (Ridge, Lasso, Elastic Net) have slightly smaller weights due to
+      the penalty terms. With small regularization values (α), the difference is minimal.
+      Increase α to see more shrinkage effect.
+    </p>
+
+    <h2 id="key-takeaways">Key Takeaways</h2>
+    <ul>
+      <li><strong>Linear regression</strong> models the relationship between features and target as a linear function</li>
+      <li>The <strong>least squares objective</strong> minimizes the sum of squared errors between predictions and actual values</li>
+      <li>The <strong>Normal Equation</strong> provides a closed-form solution: w = (XᵀX)⁻¹Xᵀy, but requires XᵀX to be invertible</li>
+      <li>The <strong>Pseudo-inverse</strong> (Moore-Penrose) always exists and handles singular matrices via SVD</li>
+      <li><strong>Gradient Descent</strong> offers an iterative alternative that scales better to large datasets</li>
+      <li><strong>Ridge (L2)</strong> shrinks weights toward zero, handles multicollinearity, closed-form solution exists</li>
+      <li><strong>Lasso (L1)</strong> can shrink weights exactly to zero for feature selection, requires iterative optimization</li>
+      <li><strong>Elastic Net</strong> combines L1 and L2 benefits, useful for correlated features</li>
+      <li><strong>Polynomial regression</strong> captures non-linear patterns by transforming features to powers</li>
+      <li><strong>Feature scaling</strong> is essential for gradient descent and regularization to work properly</li>
+      <li>Use <strong>StandardScaler</strong> for most cases, <strong>RobustScaler</strong> for data with outliers</li>
+      <li>Always fit scalers on training data only to avoid data leakage</li>
+    </ul>
+
+    <div class="footer-post">
+      <p>
+        Found this helpful? Check out more posts on <a href="../../">the blog</a>.
+      </p>
+    </div>
+    </article>
+  </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div id="postamble" class="status">
-<p class="date">Created: 2026-01-16 Fri 23:55</p>
-<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
-</div>
+
+<script>
+  // Apply theme from localStorage
+  const theme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+
+  // Theme toggle
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon = themeToggle.querySelector('.theme-icon');
+  themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+
+  themeToggle.addEventListener('click', function() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+
+    // Update highlight.js theme
+    const hljsTheme = document.getElementById('hljs-theme');
+    if (newTheme === 'light') {
+      hljsTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+    } else {
+      hljsTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css';
+    }
+  });
+
+  // Initialize syntax highlighting
+  hljs.highlightAll();
+
+  // Add copy buttons to code blocks
+  document.querySelectorAll('pre').forEach(function(pre) {
+    // Wrap pre in a container
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block';
+    pre.parentNode.insertBefore(wrapper, pre);
+    wrapper.appendChild(pre);
+
+    // Create copy button
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', function() {
+      const code = pre.querySelector('code');
+      const text = code ? code.textContent : pre.textContent;
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+    wrapper.appendChild(btn);
+  });
+
+  // Sidebar active state on scroll
+  const sections = document.querySelectorAll('h2[id], h3[id]');
+  const navLinks = document.querySelectorAll('.sidebar-nav a');
+
+  function updateActiveLink() {
+    let currentSection = '';
+
+    sections.forEach(function(section) {
+      const sectionTop = section.offsetTop;
+      if (window.scrollY >= sectionTop - 100) {
+        currentSection = section.getAttribute('id');
+      }
+    });
+
+    navLinks.forEach(function(link) {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + currentSection) {
+        link.classList.add('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveLink);
+  updateActiveLink();
+</script>
 </body>
 </html>

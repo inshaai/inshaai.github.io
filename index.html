@@ -3,15 +3,35 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>InshaAI</title>
-    <meta name="description" content="Personal blog." />
+    <title>INSHA-AI | Statistics, AI & Mathematics</title>
+    <meta name="description" content="Technical blog covering statistics, artificial intelligence, mathematics, and computer science with rigorous, from-first-principles explanations." />
+    <meta name="keywords" content="AI, machine learning, statistics, mathematics, computer science, tutorials" />
+    <meta name="author" content="INSHA-AI" />
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="INSHA-AI | Statistics, AI & Mathematics" />
+    <meta property="og:description" content="Technical blog covering statistics, AI, mathematics, and computer science with rigorous explanations." />
+    <meta property="og:url" content="https://insha-ai.com/" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="INSHA-AI | Statistics, AI & Mathematics" />
+    <meta name="twitter:description" content="Technical blog covering statistics, AI, mathematics, and computer science." />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#0b1220" />
+
     <link rel="stylesheet" href="styles.css" />
   </head>
 
   <body>
+    <!-- Skip to main content for accessibility -->
+    <a href="#app" class="skip-link">Skip to main content</a>
+
     <header class="topbar">
       <div class="container topbar__inner">
-        <a class="brand" href="#/">InshaAI</a>
+        <a class="brand" href="./">INSHA-AI</a>
 
         <input
           id="searchInput"
@@ -20,6 +40,10 @@
           placeholder="Search posts..."
           aria-label="Search posts"
         />
+
+        <button id="themeToggle" class="btn theme-toggle" aria-label="Toggle dark/light theme" title="Toggle theme">
+          <span class="theme-icon">☀️</span>
+        </button>
       </div>
     </header>
 
@@ -27,8 +51,8 @@
 
     <footer class="footer">
       <div class="container footer__inner">
-        <span class="muted small">© <span id="year"></span> Insha AI</span>
-        <span class="muted small">Static HTML/CSS/JS</span>
+        <span class="muted small">© <span id="year"></span> INSHA-AI</span>
+        <span class="muted small">Built with ❤️</span>
       </div>
     </footer>
 

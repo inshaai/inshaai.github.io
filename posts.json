@@ -1,0 +1,29 @@
+[
+  {
+    "id": "welcome",
+    "title": "Welcome",
+    "date": "2026-01-16",
+    "tags": ["meta"],
+    "excerpt": "What this site is and what I will publish here.",
+    "url": "./posts/2026-01-16-welcome/",
+    "readingTime": 2
+  },
+  {
+    "id": "logistic-regression",
+    "title": "Logistic Regression From Scratch",
+    "date": "2026-01-17",
+    "tags": ["machine-learning", "classification", "python"],
+    "excerpt": "Complete guide to binary classification: sigmoid, cross-entropy loss, gradient descent, and evaluation metrics.",
+    "url": "./posts/2026-01-17-logistic-regression-from-scratch/",
+    "readingTime": 20
+  },
+  {
+    "id": "linear-regression",
+    "title": "Linear Regression From Scratch",
+    "date": "2026-01-16",
+    "tags": ["machine-learning", "statistics", "python", "regularization"],
+    "excerpt": "Complete guide: OLS, Ridge, Lasso, Polynomial Regression, and Feature Scaling with Python implementations from scratch.",
+    "url": "./posts/2026-01-16-linear-regression-from-scratch/",
+    "readingTime": 25
+  }
+]

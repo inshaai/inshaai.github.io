@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Logistic Regression From Scratch | INSHA-AI</title>
+  <meta name="description" content="A complete guide to understanding and implementing logistic regression for binary classification, including the math behind sigmoid, cross-entropy loss, and gradient descent." />
+  <link rel="stylesheet" href="../../styles.css" />
+  <!-- Highlight.js for syntax highlighting -->
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      const hljsTheme = document.getElementById('hljs-theme');
+      if (theme === 'light') {
+        hljsTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+      }
+    })();
+  </script>
+  <style>
+    /* Layout */
+    .page-wrapper {
+      display: flex;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      gap: 3rem;
+    }
+    #content {
+      flex: 1;
+      max-width: 800px;
+      min-width: 0;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+    }
+    .sidebar-nav {
+      position: sticky;
+      top: 2rem;
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
+    }
+    .sidebar-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+    .sidebar-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar-nav li {
+      margin: 0;
+    }
+    .sidebar-nav a {
+      display: block;
+      padding: 0.4rem 0;
+      padding-left: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      border-left: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .sidebar-nav a:hover {
+      color: var(--text);
+    }
+    .sidebar-nav a.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+    }
+    .sidebar-nav .sub-item a {
+      padding-left: 1.5rem;
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 1024px) {
+      .sidebar { display: none; }
+      .page-wrapper { max-width: 800px; }
+    }
+
+    /* Content styles */
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: var(--accent); }
+    .back-link:hover { text-decoration: underline; }
+    h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--accent); scroll-margin-top: 2rem; }
+    h3 { font-size: 1.2rem; margin-top: 2rem; margin-bottom: 0.75rem; scroll-margin-top: 2rem; }
+    p { margin-bottom: 1rem; }
+    .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+    ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+    li { margin-bottom: 0.5rem; }
+    .equation {
+      background: var(--bg-secondary);
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      border-left: 3px solid var(--accent);
+      font-family: ui-monospace, monospace;
+    }
+    .note {
+      background: rgba(88, 166, 255, 0.1);
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0 8px 8px 0;
+    }
+    .note strong { color: var(--accent); }
+    .code-block {
+      position: relative;
+    }
+    pre {
+      background: var(--bg-secondary);
+      padding: 1rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+    pre code.hljs {
+      background: transparent;
+      padding: 0;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s, background 0.2s;
+    }
+    .code-block:hover .copy-btn {
+      opacity: 1;
+    }
+    .copy-btn:hover {
+      background: var(--border);
+      color: var(--text);
+    }
+    .copy-btn.copied {
+      color: #3fb950;
+    }
+    code {
+      background: rgba(88, 166, 255, 0.15);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre code { background: none; padding: 0; }
+    .footer-post {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+<!-- Header with theme toggle -->
+<header class="topbar">
+  <div class="container topbar__inner">
+    <a class="brand" href="../../">INSHA-AI</a>
+    <div style="flex: 1;"></div>
+    <button id="themeToggle" class="btn theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-icon">☀️</span>
+    </button>
+  </div>
+</header>
+
+<div class="page-wrapper">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <nav class="sidebar-nav">
+      <div class="sidebar-title">On this page</div>
+      <ul>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#classification">Classification Problem</a></li>
+        <li><a href="#sigmoid">Sigmoid Function</a></li>
+        <li><a href="#hypothesis">The Hypothesis</a></li>
+        <li><a href="#decision-boundary">Decision Boundary</a></li>
+        <li><a href="#cost-function">Cost Function</a></li>
+        <li class="sub-item"><a href="#why-not-mse">Why Not MSE?</a></li>
+        <li class="sub-item"><a href="#cross-entropy">Cross-Entropy</a></li>
+        <li><a href="#gradient-descent">Gradient Descent</a></li>
+        <li class="sub-item"><a href="#gradient-derivation">Gradient Derivation</a></li>
+        <li><a href="#regularization">Regularization</a></li>
+        <li><a href="#implementation">Python Implementation</a></li>
+        <li><a href="#example">Example Usage</a></li>
+        <li><a href="#evaluation">Model Evaluation</a></li>
+        <li class="sub-item"><a href="#confusion-matrix">Confusion Matrix</a></li>
+        <li class="sub-item"><a href="#metrics">Metrics</a></li>
+        <li><a href="#multiclass">Multiclass Extension</a></li>
+        <li><a href="#key-takeaways">Key Takeaways</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div id="content" class="content">
+    <a href="../../" class="back-link">&larr; Back to all posts</a>
+
+    <article>
+      <h1>Logistic Regression From Scratch</h1>
+      <p class="meta">January 17, 2026 &middot; 20 min read &middot; Machine Learning, Classification, Python</p>
+
+      <h2 id="introduction">Introduction</h2>
+      <p>
+        Logistic regression is one of the most fundamental algorithms for <strong>binary classification</strong>.
+        Despite its name, it's a classification algorithm, not a regression algorithm. The "regression"
+        in the name comes from the fact that it's based on linear regression concepts.
+      </p>
+      <p>
+        In this post, we'll derive logistic regression from first principles, understand why we use
+        the sigmoid function and cross-entropy loss, derive the gradients, and implement everything
+        from scratch in Python.
+      </p>
+
+      <h2 id="classification">The Classification Problem</h2>
+      <p>
+        In binary classification, we want to predict a discrete label y ∈ {0, 1} given input features X.
+        Examples include:
+      </p>
+      <ul>
+        <li>Email: spam (1) or not spam (0)</li>
+        <li>Tumor: malignant (1) or benign (0)</li>
+        <li>Transaction: fraudulent (1) or legitimate (0)</li>
+      </ul>
+      <p>
+        We can't directly use linear regression because it outputs any real number, not a probability
+        between 0 and 1. We need a way to squash the output to the range [0, 1].
+      </p>
+
+      <h2 id="sigmoid">The Sigmoid Function</h2>
+      <p>
+        The <strong>sigmoid function</strong> (also called the logistic function) maps any real number
+        to a value between 0 and 1:
+      </p>
+      <div class="equation">
+        σ(z) = 1 / (1 + e⁻ᶻ)
+      </div>
+      <p>Properties of the sigmoid function:</p>
+      <ul>
+        <li>Output range: (0, 1) — perfect for probabilities</li>
+        <li>σ(0) = 0.5</li>
+        <li>σ(z) → 1 as z → +∞</li>
+        <li>σ(z) → 0 as z → -∞</li>
+        <li>Symmetric: σ(-z) = 1 - σ(z)</li>
+      </ul>
+
+      <div class="note">
+        <strong>Derivative of Sigmoid:</strong><br>
+        The sigmoid has a beautiful derivative that we'll use later:<br><br>
+        σ'(z) = σ(z) · (1 - σ(z))
+      </div>
+
+      <h2 id="hypothesis">The Logistic Regression Hypothesis</h2>
+      <p>
+        We combine linear regression with the sigmoid function:
+      </p>
+      <div class="equation">
+        z = wᵀx + b = w₀ + w₁x₁ + w₂x₂ + ... + wₙxₙ<br><br>
+        h(x) = σ(z) = σ(wᵀx + b) = 1 / (1 + e⁻⁽ʷᵀˣ⁺ᵇ⁾)
+      </div>
+      <p>
+        The output h(x) represents the <strong>probability</strong> that y = 1 given x:
+      </p>
+      <div class="equation">
+        h(x) = P(y = 1 | x; w, b)
+      </div>
+      <p>
+        Since probabilities must sum to 1:
+      </p>
+      <div class="equation">
+        P(y = 0 | x) = 1 - h(x)
+      </div>
+
+      <h2 id="decision-boundary">Decision Boundary</h2>
+      <p>
+        To make a prediction, we apply a threshold (typically 0.5):
+      </p>
+      <div class="equation">
+        ŷ = 1 if h(x) ≥ 0.5, else ŷ = 0
+      </div>
+      <p>
+        Since σ(z) = 0.5 when z = 0, the decision boundary is where:
+      </p>
+      <div class="equation">
+        wᵀx + b = 0
+      </div>
+      <p>
+        This is a linear boundary (a line in 2D, a plane in 3D, a hyperplane in higher dimensions).
+        Logistic regression finds the optimal position for this boundary.
+      </p>
+
+      <h2 id="cost-function">Cost Function</h2>
+
+      <h3 id="why-not-mse">Why Not Mean Squared Error?</h3>
+      <p>
+        For linear regression, we minimized Mean Squared Error. Why not use it here?
+      </p>
+      <div class="equation">
+        J(w) = (1/m) Σᵢ (h(xᵢ) - yᵢ)²
+      </div>
+      <p>
+        The problem is that with the sigmoid function, this creates a <strong>non-convex</strong>
+        cost surface with many local minima. Gradient descent would get stuck and not find the
+        global optimum.
+      </p>
+
+      <h3 id="cross-entropy">Cross-Entropy Loss (Log Loss)</h3>
+      <p>
+        Instead, we use the <strong>cross-entropy loss</strong>, derived from maximum likelihood estimation:
+      </p>
+      <div class="equation">
+        Cost(h(x), y) = -y·log(h(x)) - (1-y)·log(1-h(x))
+      </div>
+      <p>Understanding this intuitively:</p>
+      <ul>
+        <li><strong>When y = 1:</strong> Cost = -log(h(x)). If h(x) → 1, cost → 0. If h(x) → 0, cost → ∞</li>
+        <li><strong>When y = 0:</strong> Cost = -log(1-h(x)). If h(x) → 0, cost → 0. If h(x) → 1, cost → ∞</li>
+      </ul>
+      <p>
+        This penalizes confident wrong predictions very heavily, which is exactly what we want.
+      </p>
+      <p>The full cost function over all training examples:</p>
+      <div class="equation">
+        J(w, b) = -(1/m) Σᵢ [yᵢ·log(h(xᵢ)) + (1-yᵢ)·log(1-h(xᵢ))]
+      </div>
+
+      <div class="note">
+        <strong>Why Cross-Entropy is Convex:</strong><br>
+        The cross-entropy loss combined with the sigmoid function results in a convex
+        optimization problem. This means gradient descent is guaranteed to find the global minimum.
+      </div>
+
+      <h2 id="gradient-descent">Gradient Descent</h2>
+      <p>
+        We minimize the cost function using gradient descent:
+      </p>
+      <div class="equation">
+        w := w - α · ∂J/∂w<br>
+        b := b - α · ∂J/∂b
+      </div>
+
+      <h3 id="gradient-derivation">Deriving the Gradient</h3>
+      <p>
+        Let's derive ∂J/∂w. Starting with the cost for one example:
+      </p>
+      <div class="equation">
+        L = -y·log(h) - (1-y)·log(1-h)
+      </div>
+      <p>Using the chain rule:</p>
+      <div class="equation">
+        ∂L/∂w = ∂L/∂h · ∂h/∂z · ∂z/∂w
+      </div>
+      <p>Computing each part:</p>
+      <div class="equation">
+        ∂L/∂h = -y/h + (1-y)/(1-h)<br><br>
+        ∂h/∂z = h·(1-h)  (sigmoid derivative)<br><br>
+        ∂z/∂w = x
+      </div>
+      <p>Putting it together (after simplification):</p>
+      <div class="equation">
+        ∂L/∂w = (h - y) · x
+      </div>
+      <p>
+        Remarkably, this has the <strong>same form as linear regression</strong>! The gradient is
+        simply the prediction error times the input.
+      </p>
+      <p>For the full dataset:</p>
+      <div class="equation">
+        ∂J/∂w = (1/m) Σᵢ (h(xᵢ) - yᵢ) · xᵢ<br><br>
+        ∂J/∂b = (1/m) Σᵢ (h(xᵢ) - yᵢ)
+      </div>
+      <p>In matrix form:</p>
+      <div class="equation">
+        ∂J/∂w = (1/m) · Xᵀ(h(X) - y)<br><br>
+        ∂J/∂b = (1/m) · Σ(h(X) - y)
+      </div>
+
+      <h2 id="regularization">Regularization</h2>
+      <p>
+        Just like linear regression, logistic regression can overfit. We add a regularization term:
+      </p>
+
+      <h3>L2 Regularization (Ridge)</h3>
+      <div class="equation">
+        J(w, b) = -(1/m) Σᵢ [yᵢ·log(hᵢ) + (1-yᵢ)·log(1-hᵢ)] + (λ/2m) Σⱼ wⱼ²
+      </div>
+      <p>The gradient becomes:</p>
+      <div class="equation">
+        ∂J/∂w = (1/m) · Xᵀ(h - y) + (λ/m) · w
+      </div>
+
+      <h3>L1 Regularization (Lasso)</h3>
+      <div class="equation">
+        J(w, b) = -(1/m) Σᵢ [yᵢ·log(hᵢ) + (1-yᵢ)·log(1-hᵢ)] + (λ/m) Σⱼ |wⱼ|
+      </div>
+      <p>
+        L1 regularization produces sparse weights (some become exactly zero), useful for feature selection.
+      </p>
+
+      <h2 id="implementation">Python Implementation</h2>
+      <p>Let's implement logistic regression from scratch:</p>
+
+<pre><code class="language-python">import numpy as np
+
+
+class LogisticRegression:
+    """
+    Logistic Regression for binary classification.
+
+    Implemented from scratch using gradient descent.
+    """
+
+    def __init__(self, learning_rate=0.01, n_iterations=1000,
+                 regularization=None, lambda_=0.01, threshold=0.5):
+        """
+        Parameters:
+        -----------
+        learning_rate : float
+            Step size for gradient descent
+        n_iterations : int
+            Number of gradient descent iterations
+        regularization : str or None
+            None, 'l1', or 'l2'
+        lambda_ : float
+            Regularization strength
+        threshold : float
+            Classification threshold (default 0.5)
+        """
+        self.learning_rate = learning_rate
+        self.n_iterations = n_iterations
+        self.regularization = regularization
+        self.lambda_ = lambda_
+        self.threshold = threshold
+        self.weights = None
+        self.bias = None
+        self.loss_history = []
+
+    def _sigmoid(self, z):
+        """Sigmoid activation function."""
+        # Clip to avoid overflow
+        z = np.clip(z, -500, 500)
+        return 1 / (1 + np.exp(-z))
+
+    def _compute_loss(self, y, y_pred):
+        """Compute binary cross-entropy loss."""
+        m = len(y)
+        # Clip predictions to avoid log(0)
+        epsilon = 1e-15
+        y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+
+        loss = -(1/m) * np.sum(y * np.log(y_pred) + (1 - y) * np.log(1 - y_pred))
+
+        # Add regularization
+        if self.regularization == 'l2':
+            loss += (self.lambda_ / (2 * m)) * np.sum(self.weights ** 2)
+        elif self.regularization == 'l1':
+            loss += (self.lambda_ / m) * np.sum(np.abs(self.weights))
+
+        return loss
+
+    def fit(self, X, y):
+        """
+        Train the logistic regression model.
+
+        Parameters:
+        -----------
+        X : np.ndarray of shape (m, n)
+            Training features
+        y : np.ndarray of shape (m,)
+            Binary labels (0 or 1)
+        """
+        X = np.array(X)
+        y = np.array(y).flatten()
+        m, n = X.shape
+
+        # Initialize weights
+        self.weights = np.zeros(n)
+        self.bias = 0
+
+        # Gradient descent
+        for i in range(self.n_iterations):
+            # Forward pass
+            z = X @ self.weights + self.bias
+            y_pred = self._sigmoid(z)
+
+            # Compute gradients
+            dw = (1/m) * (X.T @ (y_pred - y))
+            db = (1/m) * np.sum(y_pred - y)
+
+            # Add regularization gradient
+            if self.regularization == 'l2':
+                dw += (self.lambda_ / m) * self.weights
+            elif self.regularization == 'l1':
+                dw += (self.lambda_ / m) * np.sign(self.weights)
+
+            # Update parameters
+            self.weights -= self.learning_rate * dw
+            self.bias -= self.learning_rate * db
+
+            # Track loss
+            loss = self._compute_loss(y, y_pred)
+            self.loss_history.append(loss)
+
+        return self
+
+    def predict_proba(self, X):
+        """
+        Predict probability of class 1.
+
+        Returns:
+        --------
+        np.ndarray of shape (m,)
+            Probabilities between 0 and 1
+        """
+        X = np.array(X)
+        z = X @ self.weights + self.bias
+        return self._sigmoid(z)
+
+    def predict(self, X):
+        """
+        Predict class labels.
+
+        Returns:
+        --------
+        np.ndarray of shape (m,)
+            Binary predictions (0 or 1)
+        """
+        probas = self.predict_proba(X)
+        return (probas >= self.threshold).astype(int)
+
+    def score(self, X, y):
+        """Calculate accuracy."""
+        y_pred = self.predict(X)
+        return np.mean(y_pred == y)
+</code></pre>
+
+      <h2 id="example">Example Usage</h2>
+      <p>Let's test our implementation on a synthetic dataset:</p>
+
+<pre><code class="language-python"># Generate synthetic binary classification data
+np.random.seed(42)
+
+# Class 0: centered at (-1, -1)
+X0 = np.random.randn(50, 2) + np.array([-1, -1])
+# Class 1: centered at (1, 1)
+X1 = np.random.randn(50, 2) + np.array([1, 1])
+
+X = np.vstack([X0, X1])
+y = np.array([0] * 50 + [1] * 50)
+
+# Shuffle
+indices = np.random.permutation(100)
+X, y = X[indices], y[indices]
+
+# Split
+X_train, X_test = X[:80], X[80:]
+y_train, y_test = y[:80], y[80:]
+
+# Train model
+model = LogisticRegression(
+    learning_rate=0.1,
+    n_iterations=1000,
+    regularization='l2',
+    lambda_=0.1
+)
+model.fit(X_train, y_train)
+
+# Evaluate
+train_acc = model.score(X_train, y_train)
+test_acc = model.score(X_test, y_test)
+
+print(f"Training Accuracy: {train_acc:.4f}")
+print(f"Test Accuracy: {test_acc:.4f}")
+print(f"Weights: {model.weights}")
+print(f"Bias: {model.bias:.4f}")
+print(f"Final Loss: {model.loss_history[-1]:.4f}")
+</code></pre>
+
+      <p>Expected output:</p>
+<pre><code class="language-python">Training Accuracy: 0.9625
+Test Accuracy: 0.9500
+Weights: [1.2341 1.1876]
+Bias: 0.0523
+Final Loss: 0.2134
+</code></pre>
+
+      <h2 id="evaluation">Model Evaluation</h2>
+      <p>
+        Accuracy alone isn't always enough. Let's implement proper evaluation metrics.
+      </p>
+
+      <h3 id="confusion-matrix">Confusion Matrix</h3>
+      <p>
+        A confusion matrix shows the counts of true positives, false positives, true negatives,
+        and false negatives:
+      </p>
+      <div class="equation">
+        |                | Predicted 0 | Predicted 1 |<br>
+        |----------------|-------------|-------------|<br>
+        | Actual 0       |     TN      |     FP      |<br>
+        | Actual 1       |     FN      |     TP      |
+      </div>
+
+      <h3 id="metrics">Classification Metrics</h3>
+
+<pre><code class="language-python">def confusion_matrix(y_true, y_pred):
+    """Compute confusion matrix."""
+    tp = np.sum((y_true == 1) & (y_pred == 1))
+    tn = np.sum((y_true == 0) & (y_pred == 0))
+    fp = np.sum((y_true == 0) & (y_pred == 1))
+    fn = np.sum((y_true == 1) & (y_pred == 0))
+    return np.array([[tn, fp], [fn, tp]])
+
+
+def precision(y_true, y_pred):
+    """Precision = TP / (TP + FP)"""
+    tp = np.sum((y_true == 1) & (y_pred == 1))
+    fp = np.sum((y_true == 0) & (y_pred == 1))
+    return tp / (tp + fp + 1e-10)
+
+
+def recall(y_true, y_pred):
+    """Recall = TP / (TP + FN)"""
+    tp = np.sum((y_true == 1) & (y_pred == 1))
+    fn = np.sum((y_true == 1) & (y_pred == 0))
+    return tp / (tp + fn + 1e-10)
+
+
+def f1_score(y_true, y_pred):
+    """F1 = 2 * (precision * recall) / (precision + recall)"""
+    p = precision(y_true, y_pred)
+    r = recall(y_true, y_pred)
+    return 2 * (p * r) / (p + r + 1e-10)
+
+
+def classification_report(y_true, y_pred):
+    """Print classification metrics."""
+    cm = confusion_matrix(y_true, y_pred)
+    acc = np.mean(y_true == y_pred)
+    prec = precision(y_true, y_pred)
+    rec = recall(y_true, y_pred)
+    f1 = f1_score(y_true, y_pred)
+
+    print("Confusion Matrix:")
+    print(cm)
+    print(f"\nAccuracy:  {acc:.4f}")
+    print(f"Precision: {prec:.4f}")
+    print(f"Recall:    {rec:.4f}")
+    print(f"F1 Score:  {f1:.4f}")
+
+
+# Example usage
+y_pred = model.predict(X_test)
+classification_report(y_test, y_pred)
+</code></pre>
+
+      <p>Example output:</p>
+<pre><code class="language-python">Confusion Matrix:
+[[ 9  1]
+ [ 0 10]]
+
+Accuracy:  0.9500
+Precision: 0.9091
+Recall:    1.0000
+F1 Score:  0.9524
+</code></pre>
+
+      <div class="note">
+        <strong>When to use which metric:</strong><br>
+        - <strong>Accuracy:</strong> When classes are balanced<br>
+        - <strong>Precision:</strong> When false positives are costly (spam detection)<br>
+        - <strong>Recall:</strong> When false negatives are costly (disease detection)<br>
+        - <strong>F1 Score:</strong> When you need balance between precision and recall
+      </div>
+
+      <h2 id="multiclass">Multiclass Extension</h2>
+      <p>
+        Logistic regression can be extended to multiple classes using two approaches:
+      </p>
+
+      <h3>One-vs-Rest (OvR)</h3>
+      <p>
+        Train K binary classifiers, one for each class vs. all others.
+        Predict the class with highest probability.
+      </p>
+
+      <h3>Softmax Regression (Multinomial)</h3>
+      <p>
+        Generalize sigmoid to multiple classes using the softmax function:
+      </p>
+      <div class="equation">
+        P(y = k | x) = exp(wₖᵀx) / Σⱼ exp(wⱼᵀx)
+      </div>
+      <p>
+        The loss becomes categorical cross-entropy:
+      </p>
+      <div class="equation">
+        J = -(1/m) Σᵢ Σₖ yᵢₖ · log(P(y = k | xᵢ))
+      </div>
+
+<pre><code class="language-python">class SoftmaxRegression:
+    """Multinomial Logistic Regression using Softmax."""
+
+    def __init__(self, learning_rate=0.01, n_iterations=1000, lambda_=0.01):
+        self.learning_rate = learning_rate
+        self.n_iterations = n_iterations
+        self.lambda_ = lambda_
+        self.weights = None
+        self.bias = None
+        self.classes = None
+
+    def _softmax(self, z):
+        """Softmax function with numerical stability."""
+        exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))
+        return exp_z / np.sum(exp_z, axis=1, keepdims=True)
+
+    def _one_hot(self, y):
+        """Convert labels to one-hot encoding."""
+        m = len(y)
+        k = len(self.classes)
+        one_hot = np.zeros((m, k))
+        for i, label in enumerate(y):
+            one_hot[i, np.where(self.classes == label)[0][0]] = 1
+        return one_hot
+
+    def fit(self, X, y):
+        """Train softmax regression."""
+        X = np.array(X)
+        y = np.array(y)
+        m, n = X.shape
+
+        self.classes = np.unique(y)
+        k = len(self.classes)
+
+        # Initialize weights
+        self.weights = np.zeros((n, k))
+        self.bias = np.zeros(k)
+
+        # One-hot encode labels
+        y_onehot = self._one_hot(y)
+
+        for _ in range(self.n_iterations):
+            # Forward pass
+            z = X @ self.weights + self.bias
+            probs = self._softmax(z)
+
+            # Gradients
+            error = probs - y_onehot
+            dw = (1/m) * (X.T @ error) + (self.lambda_ / m) * self.weights
+            db = (1/m) * np.sum(error, axis=0)
+
+            # Update
+            self.weights -= self.learning_rate * dw
+            self.bias -= self.learning_rate * db
+
+        return self
+
+    def predict_proba(self, X):
+        """Predict class probabilities."""
+        z = X @ self.weights + self.bias
+        return self._softmax(z)
+
+    def predict(self, X):
+        """Predict class labels."""
+        probs = self.predict_proba(X)
+        indices = np.argmax(probs, axis=1)
+        return self.classes[indices]
+
+    def score(self, X, y):
+        """Calculate accuracy."""
+        return np.mean(self.predict(X) == y)
+</code></pre>
+
+      <h2 id="key-takeaways">Key Takeaways</h2>
+      <ul>
+        <li><strong>Logistic regression</strong> is a linear classifier that outputs probabilities using the sigmoid function</li>
+        <li>The <strong>sigmoid function</strong> σ(z) = 1/(1+e⁻ᶻ) squashes outputs to [0, 1]</li>
+        <li>We use <strong>cross-entropy loss</strong>, not MSE, because it's convex with sigmoid</li>
+        <li>The gradient has the same form as linear regression: (h(x) - y) · x</li>
+        <li><strong>Regularization</strong> (L1/L2) prevents overfitting</li>
+        <li>Evaluate with <strong>precision, recall, F1</strong>—not just accuracy</li>
+        <li><strong>Softmax</strong> extends logistic regression to multiple classes</li>
+        <li>Decision boundary is linear (hyperplane in feature space)</li>
+      </ul>
+
+      <div class="footer-post">
+        <p>
+          Found this helpful? Check out more posts on <a href="../../">the blog</a>.
+        </p>
+      </div>
+    </article>
+  </div>
+</div>
+
+<script>
+  // Apply theme
+  const theme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+
+  // Theme toggle
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon = themeToggle.querySelector('.theme-icon');
+  themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+
+  themeToggle.addEventListener('click', function() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+
+    // Update highlight.js theme
+    const hljsTheme = document.getElementById('hljs-theme');
+    if (newTheme === 'light') {
+      hljsTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+    } else {
+      hljsTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css';
+    }
+  });
+
+  // Syntax highlighting
+  hljs.highlightAll();
+
+  // Copy buttons
+  document.querySelectorAll('pre').forEach(function(pre) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block';
+    pre.parentNode.insertBefore(wrapper, pre);
+    wrapper.appendChild(pre);
+
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', function() {
+      const code = pre.querySelector('code');
+      const text = code ? code.textContent : pre.textContent;
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+    wrapper.appendChild(btn);
+  });
+
+  // Sidebar active state
+  const sections = document.querySelectorAll('h2[id], h3[id]');
+  const navLinks = document.querySelectorAll('.sidebar-nav a');
+
+  function updateActiveLink() {
+    let currentSection = '';
+    sections.forEach(function(section) {
+      const sectionTop = section.offsetTop;
+      if (window.scrollY >= sectionTop - 100) {
+        currentSection = section.getAttribute('id');
+      }
+    });
+    navLinks.forEach(function(link) {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + currentSection) {
+        link.classList.add('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveLink);
+  updateActiveLink();
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+#+OPTIONS: toc:nil num:nil author:nil date:nil creator:nil html-validation-link:nil
+#+PROPERTY: header-args :eval never-export
+#+HTML_HEAD: <link rel="stylesheet" href="../../styles.css">
+
+
+* Linear Regression
+
+This is really amazing model
+
+** Theory
+
+
+ here is theory
+
+** Code
+here is the code
+
+#+BEGIN_SRC python
+  class LinearRegressin:
+      def __init__(self):
+          return self
+
+      def fit(self):
+          pass
+
+      def predict(self):
+          pass
+#+END_SRC 
