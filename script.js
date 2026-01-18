@@ -116,11 +116,6 @@ function renderIndex() {
                 <h2 class="h2">
                   <a href="${escapeHtml(p.url)}">${escapeHtml(p.title)}</a>
                 </h2>
-                <div class="post-meta">
-                  <span class="muted small">${escapeHtml(p.date)}</span>
-                  <span class="muted small">·</span>
-                  <span class="muted small">${p.readingTime || 3} min read</span>
-                </div>
                 <p class="muted">${escapeHtml(p.excerpt)}</p>
                 <div class="badges">
                   ${p.tags.map((t) => `<span class="badge">${escapeHtml(t)}</span>`).join("")}
