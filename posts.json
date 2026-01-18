@@ -9,15 +9,6 @@
     "readingTime": 25
   },
   {
-    "id": "welcome",
-    "title": "Welcome",
-    "date": "2026-01-16",
-    "tags": ["meta"],
-    "excerpt": "What this site is and what I will publish here.",
-    "url": "./posts/2026-01-16-welcome/",
-    "readingTime": 2
-  },
-  {
     "id": "logistic-regression",
     "title": "Logistic Regression From Scratch",
     "date": "2026-01-17",

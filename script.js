@@ -74,8 +74,13 @@ function renderIndex() {
   const allTags = [...new Set(POSTS.flatMap((p) => p.tags))].sort();
 
   app.innerHTML = `
+    <section class="card welcome-section">
+      <h1 class="h1">Welcome to INSHA-AI</h1>
+      <p>This site is a space where I publish my written work including structured notes and essays. Many posts will grow out of personal notes, lectures, or experiments, refined into standalone articles.</p>
+    </section>
+
     <section class="card">
-      <h1 class="h1">Blog</h1>
+      <h1 class="h1">Articles</h1>
       <p class="muted">Technical posts on statistics, AI, and mathematics</p>
       <div class="hr"></div>
 
