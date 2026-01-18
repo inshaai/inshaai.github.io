@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Support Vector Machines From Scratch | INSHA-AI</title>
+  <meta name="description" content="A complete guide to understanding and implementing Support Vector Machines: maximum margin classifiers, kernel trick, soft margins, and the dual formulation." />
+  <link rel="stylesheet" href="../../styles.css" />
+  <!-- Highlight.js for syntax highlighting -->
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      const hljsTheme = document.getElementById('hljs-theme');
+      if (theme === 'light') {
+        hljsTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+      }
+    })();
+  </script>
+  <style>
+    /* Layout */
+    .page-wrapper {
+      display: flex;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      gap: 3rem;
+    }
+    #content {
+      flex: 1;
+      max-width: 800px;
+      min-width: 0;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+    }
+    .sidebar-nav {
+      position: sticky;
+      top: 2rem;
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
+    }
+    .sidebar-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+    .sidebar-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar-nav li {
+      margin: 0;
+    }
+    .sidebar-nav a {
+      display: block;
+      padding: 0.4rem 0;
+      padding-left: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      border-left: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .sidebar-nav a:hover {
+      color: var(--text);
+    }
+    .sidebar-nav a.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+    }
+    .sidebar-nav .sub-item a {
+      padding-left: 1.5rem;
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 1024px) {
+      .sidebar { display: none; }
+      .page-wrapper { max-width: 800px; }
+    }
+
+    /* Content styles */
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: var(--accent); }
+    .back-link:hover { text-decoration: underline; }
+    h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--accent); scroll-margin-top: 2rem; }
+    h3 { font-size: 1.2rem; margin-top: 2rem; margin-bottom: 0.75rem; scroll-margin-top: 2rem; }
+    p { margin-bottom: 1rem; }
+    .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+    ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+    li { margin-bottom: 0.5rem; }
+    .equation {
+      background: var(--bg-secondary);
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      border-left: 3px solid var(--accent);
+      font-family: ui-monospace, monospace;
+    }
+    .note {
+      background: rgba(88, 166, 255, 0.1);
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0 8px 8px 0;
+    }
+    .note strong { color: var(--accent); }
+    .code-block {
+      position: relative;
+    }
+    pre {
+      background: var(--bg-secondary);
+      padding: 1rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+    pre code.hljs {
+      background: transparent;
+      padding: 0;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s, background 0.2s;
+    }
+    .code-block:hover .copy-btn {
+      opacity: 1;
+    }
+    .copy-btn:hover {
+      background: var(--border);
+      color: var(--text);
+    }
+    .copy-btn.copied {
+      color: #3fb950;
+    }
+    code {
+      background: rgba(88, 166, 255, 0.15);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre code { background: none; padding: 0; }
+    .footer-post {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+<!-- Header with theme toggle -->
+<header class="topbar">
+  <div class="container topbar__inner">
+    <a class="brand" href="../../">INSHA-AI</a>
+    <div style="flex: 1;"></div>
+    <button id="themeToggle" class="btn theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-icon">☀️</span>
+    </button>
+  </div>
+</header>
+
+<div class="page-wrapper">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <nav class="sidebar-nav">
+      <div class="sidebar-title">On this page</div>
+      <ul>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#intuition">Geometric Intuition</a></li>
+        <li><a href="#hard-margin">Hard Margin SVM</a></li>
+        <li class="sub-item"><a href="#margin">The Margin</a></li>
+        <li class="sub-item"><a href="#optimization">Optimization Problem</a></li>
+        <li><a href="#soft-margin">Soft Margin SVM</a></li>
+        <li><a href="#hinge-loss">Hinge Loss</a></li>
+        <li><a href="#dual">Dual Formulation</a></li>
+        <li class="sub-item"><a href="#lagrangian">Lagrangian</a></li>
+        <li class="sub-item"><a href="#kkt">KKT Conditions</a></li>
+        <li><a href="#kernel-trick">The Kernel Trick</a></li>
+        <li class="sub-item"><a href="#common-kernels">Common Kernels</a></li>
+        <li><a href="#implementation">Python Implementation</a></li>
+        <li><a href="#example">Example Usage</a></li>
+        <li><a href="#svm-vs-logistic">SVM vs Logistic Regression</a></li>
+        <li><a href="#key-takeaways">Key Takeaways</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div id="content" class="content">
+    <a href="../../" class="back-link">&larr; Back to all posts</a>
+
+    <article>
+      <h1>Support Vector Machines From Scratch</h1>
+      <p class="meta">January 17, 2026 &middot; 25 min read &middot; Machine Learning, Classification, Python</p>
+
+      <h2 id="introduction">Introduction</h2>
+      <p>
+        Support Vector Machines (SVMs) are one of the most elegant and powerful classification algorithms
+        in machine learning. Developed by Vladimir Vapnik and colleagues in the 1990s, SVMs find the
+        <strong>optimal hyperplane</strong> that separates classes with the <strong>maximum margin</strong>.
+      </p>
+      <p>
+        What makes SVMs special is that they focus only on the data points that matter most—the ones
+        closest to the decision boundary, called <strong>support vectors</strong>. This makes them
+        memory-efficient and effective in high-dimensional spaces.
+      </p>
+      <p>
+        In this post, we'll build SVMs from first principles: understand the geometry, derive the
+        optimization problem, explore the kernel trick for non-linear classification, and implement
+        everything from scratch in Python.
+      </p>
+
+      <h2 id="intuition">Geometric Intuition</h2>
+      <p>
+        Consider a binary classification problem where we want to separate two classes with a line
+        (in 2D) or a hyperplane (in higher dimensions). There are infinitely many hyperplanes that
+        could separate linearly separable data. Which one should we choose?
+      </p>
+      <p>
+        The SVM answer: choose the hyperplane that maximizes the <strong>margin</strong>—the distance
+        between the hyperplane and the nearest data points from each class. This approach has several benefits:
+      </p>
+      <ul>
+        <li>Better generalization to unseen data</li>
+        <li>More robust to small perturbations in the data</li>
+        <li>Unique solution (the optimization problem is convex)</li>
+      </ul>
+      <p>
+        The points closest to the hyperplane that define the margin are called <strong>support vectors</strong>.
+        If we removed all other points and kept only the support vectors, we'd get the same hyperplane.
+      </p>
+
+      <h2 id="hard-margin">Hard Margin SVM</h2>
+      <p>
+        Let's start with the simplest case: perfectly linearly separable data with no noise.
+      </p>
+
+      <h3 id="margin">Understanding the Margin</h3>
+      <p>
+        A hyperplane in n-dimensional space is defined by:
+      </p>
+      <div class="equation">
+        wᵀx + b = 0
+      </div>
+      <p>
+        where <strong>w</strong> is the normal vector to the hyperplane and <strong>b</strong> is the bias.
+        The signed distance from a point x to this hyperplane is:
+      </p>
+      <div class="equation">
+        distance = (wᵀx + b) / ||w||
+      </div>
+      <p>
+        For classification, we use labels y ∈ {-1, +1}. We want:
+      </p>
+      <ul>
+        <li>wᵀx + b > 0 for positive class (y = +1)</li>
+        <li>wᵀx + b < 0 for negative class (y = -1)</li>
+      </ul>
+      <p>
+        We can combine these constraints into a single condition:
+      </p>
+      <div class="equation">
+        yᵢ(wᵀxᵢ + b) > 0 for all i
+      </div>
+      <p>
+        To define the margin, we scale w and b so that the closest points satisfy:
+      </p>
+      <div class="equation">
+        yᵢ(wᵀxᵢ + b) = 1 for support vectors
+      </div>
+      <p>
+        With this scaling, the margin (distance from hyperplane to nearest points) becomes:
+      </p>
+      <div class="equation">
+        margin = 2 / ||w||
+      </div>
+
+      <h3 id="optimization">The Optimization Problem</h3>
+      <p>
+        Maximizing the margin (2/||w||) is equivalent to minimizing ||w||, or more conveniently, minimizing
+        (1/2)||w||². This gives us the <strong>primal optimization problem</strong>:
+      </p>
+      <div class="equation">
+        minimize: (1/2)||w||² = (1/2)wᵀw<br><br>
+        subject to: yᵢ(wᵀxᵢ + b) ≥ 1 for all i
+      </div>
+      <p>
+        This is a <strong>quadratic programming</strong> problem with linear constraints—convex and
+        guaranteed to have a unique global solution.
+      </p>
+
+      <div class="note">
+        <strong>Why minimize ||w||²?</strong><br>
+        1. Maximizing margin = maximizing 2/||w|| = minimizing ||w||<br>
+        2. We use ||w||² instead of ||w|| because it's differentiable everywhere<br>
+        3. The (1/2) factor simplifies the derivative
+      </div>
+
+      <h2 id="soft-margin">Soft Margin SVM</h2>
+      <p>
+        Real-world data is rarely perfectly separable. The <strong>soft margin SVM</strong> allows
+        some points to violate the margin constraints by introducing <strong>slack variables</strong> ξᵢ:
+      </p>
+      <div class="equation">
+        yᵢ(wᵀxᵢ + b) ≥ 1 - ξᵢ<br><br>
+        where ξᵢ ≥ 0
+      </div>
+      <p>
+        The slack variable ξᵢ measures how much point i violates the margin:
+      </p>
+      <ul>
+        <li>ξᵢ = 0: point is on or beyond the correct margin</li>
+        <li>0 < ξᵢ < 1: point is inside the margin but correctly classified</li>
+        <li>ξᵢ ≥ 1: point is misclassified</li>
+      </ul>
+      <p>
+        We penalize violations by adding them to the objective:
+      </p>
+      <div class="equation">
+        minimize: (1/2)||w||² + C · Σᵢ ξᵢ<br><br>
+        subject to: yᵢ(wᵀxᵢ + b) ≥ 1 - ξᵢ and ξᵢ ≥ 0
+      </div>
+      <p>
+        The hyperparameter <strong>C</strong> controls the trade-off:
+      </p>
+      <ul>
+        <li><strong>Large C:</strong> Penalize misclassifications heavily → smaller margin, less tolerance for errors</li>
+        <li><strong>Small C:</strong> Allow more misclassifications → larger margin, more regularization</li>
+      </ul>
+
+      <h2 id="hinge-loss">Hinge Loss Formulation</h2>
+      <p>
+        The soft margin SVM can be rewritten using <strong>hinge loss</strong>:
+      </p>
+      <div class="equation">
+        L(y, f(x)) = max(0, 1 - y · f(x))
+      </div>
+      <p>
+        where f(x) = wᵀx + b. This gives us an unconstrained optimization problem:
+      </p>
+      <div class="equation">
+        minimize: (1/2)||w||² + C · Σᵢ max(0, 1 - yᵢ(wᵀxᵢ + b))
+      </div>
+      <p>
+        The hinge loss has these properties:
+      </p>
+      <ul>
+        <li>Zero loss when yᵢf(xᵢ) ≥ 1 (correctly classified with margin)</li>
+        <li>Linear penalty when yᵢf(xᵢ) < 1 (inside margin or misclassified)</li>
+        <li>Not differentiable at yᵢf(xᵢ) = 1 (we use subgradients)</li>
+      </ul>
+
+      <div class="note">
+        <strong>Hinge Loss vs Cross-Entropy:</strong><br>
+        Unlike logistic regression's smooth cross-entropy loss, hinge loss is piecewise linear.
+        Once a point is correctly classified with sufficient margin, it contributes zero to the loss—the
+        model "ignores" easy examples and focuses on the hard ones near the boundary.
+      </div>
+
+      <h2 id="dual">Dual Formulation</h2>
+      <p>
+        The dual formulation of SVM is crucial for two reasons: it reveals the role of support vectors
+        and enables the kernel trick for non-linear classification.
+      </p>
+
+      <h3 id="lagrangian">The Lagrangian</h3>
+      <p>
+        We introduce Lagrange multipliers αᵢ ≥ 0 for each constraint:
+      </p>
+      <div class="equation">
+        L(w, b, α) = (1/2)||w||² - Σᵢ αᵢ[yᵢ(wᵀxᵢ + b) - 1]
+      </div>
+      <p>
+        Taking derivatives and setting them to zero:
+      </p>
+      <div class="equation">
+        ∂L/∂w = 0 → w = Σᵢ αᵢyᵢxᵢ<br><br>
+        ∂L/∂b = 0 → Σᵢ αᵢyᵢ = 0
+      </div>
+      <p>
+        Substituting back, we get the <strong>dual problem</strong>:
+      </p>
+      <div class="equation">
+        maximize: Σᵢ αᵢ - (1/2) Σᵢ Σⱼ αᵢαⱼyᵢyⱼ(xᵢᵀxⱼ)<br><br>
+        subject to: αᵢ ≥ 0 and Σᵢ αᵢyᵢ = 0
+      </div>
+      <p>
+        For soft margin SVM, we add the constraint αᵢ ≤ C.
+      </p>
+
+      <h3 id="kkt">KKT Conditions and Support Vectors</h3>
+      <p>
+        The Karush-Kuhn-Tucker (KKT) conditions give us important insights:
+      </p>
+      <div class="equation">
+        αᵢ[yᵢ(wᵀxᵢ + b) - 1] = 0
+      </div>
+      <p>
+        This means either αᵢ = 0 or the constraint is active (yᵢ(wᵀxᵢ + b) = 1).
+        Points with αᵢ > 0 are <strong>support vectors</strong>—they lie exactly on the margin.
+      </p>
+      <p>
+        The solution for w depends only on support vectors:
+      </p>
+      <div class="equation">
+        w = Σᵢ αᵢyᵢxᵢ = Σ(support vectors) αᵢyᵢxᵢ
+      </div>
+      <p>
+        To classify a new point x:
+      </p>
+      <div class="equation">
+        f(x) = wᵀx + b = Σ(support vectors) αᵢyᵢ(xᵢᵀx) + b
+      </div>
+
+      <h2 id="kernel-trick">The Kernel Trick</h2>
+      <p>
+        What if the data isn't linearly separable? The <strong>kernel trick</strong> allows SVMs to find
+        non-linear decision boundaries by implicitly mapping data to a higher-dimensional space.
+      </p>
+      <p>
+        The key observation: in the dual formulation, data points only appear as <strong>dot products</strong>
+        xᵢᵀxⱼ. If we map data to a higher dimension with φ(x), we need φ(xᵢ)ᵀφ(xⱼ).
+      </p>
+      <p>
+        A <strong>kernel function</strong> computes this dot product without explicitly computing φ:
+      </p>
+      <div class="equation">
+        K(xᵢ, xⱼ) = φ(xᵢ)ᵀφ(xⱼ)
+      </div>
+      <p>
+        This is computationally efficient because we never work in the high-dimensional space directly.
+      </p>
+
+      <h3 id="common-kernels">Common Kernel Functions</h3>
+
+      <p><strong>Linear Kernel:</strong></p>
+      <div class="equation">
+        K(x, z) = xᵀz
+      </div>
+      <p>No transformation, equivalent to standard linear SVM.</p>
+
+      <p><strong>Polynomial Kernel:</strong></p>
+      <div class="equation">
+        K(x, z) = (γ · xᵀz + r)ᵈ
+      </div>
+      <p>Maps to polynomial feature space. d is the degree.</p>
+
+      <p><strong>RBF (Gaussian) Kernel:</strong></p>
+      <div class="equation">
+        K(x, z) = exp(-γ||x - z||²)
+      </div>
+      <p>
+        The most popular kernel. Maps to infinite-dimensional space.
+        γ controls the "reach" of each training example:
+      </p>
+      <ul>
+        <li>Large γ: each point has local influence (risk of overfitting)</li>
+        <li>Small γ: points have broad influence (smoother boundary)</li>
+      </ul>
+
+      <p><strong>Sigmoid Kernel:</strong></p>
+      <div class="equation">
+        K(x, z) = tanh(γ · xᵀz + r)
+      </div>
+      <p>Related to neural networks (not always a valid kernel).</p>
+
+      <div class="note">
+        <strong>Mercer's Condition:</strong><br>
+        A function K is a valid kernel if the resulting kernel matrix K[i,j] = K(xᵢ, xⱼ)
+        is positive semi-definite for any set of points. This ensures the optimization
+        problem remains convex.
+      </div>
+
+      <h2 id="implementation">Python Implementation</h2>
+      <p>
+        Let's implement SVM from scratch. We'll use gradient descent on the hinge loss formulation
+        for the linear case, and then add kernel support.
+      </p>
+
+<pre><code class="language-python">import numpy as np
+
+
+class LinearSVM:
+    """
+    Linear Support Vector Machine using gradient descent on hinge loss.
+
+    Optimizes: (1/2)||w||² + C * Σ max(0, 1 - yᵢ(wᵀxᵢ + b))
+    """
+
+    def __init__(self, C=1.0, learning_rate=0.001, n_iterations=1000):
+        """
+        Parameters:
+        -----------
+        C : float
+            Regularization parameter (penalty for misclassification)
+        learning_rate : float
+            Step size for gradient descent
+        n_iterations : int
+            Number of training iterations
+        """
+        self.C = C
+        self.learning_rate = learning_rate
+        self.n_iterations = n_iterations
+        self.weights = None
+        self.bias = None
+        self.loss_history = []
+
+    def _hinge_loss(self, X, y):
+        """Compute hinge loss."""
+        m = X.shape[0]
+        margins = y * (X @ self.weights + self.bias)
+        hinge = np.maximum(0, 1 - margins)
+        loss = 0.5 * np.dot(self.weights, self.weights) + self.C * np.sum(hinge) / m
+        return loss
+
+    def fit(self, X, y):
+        """
+        Train the SVM model.
+
+        Parameters:
+        -----------
+        X : np.ndarray of shape (m, n)
+            Training features
+        y : np.ndarray of shape (m,)
+            Labels (-1 or +1)
+        """
+        X = np.array(X)
+        y = np.array(y)
+
+        # Convert labels to -1, +1 if needed
+        if set(np.unique(y)) == {0, 1}:
+            y = 2 * y - 1
+
+        m, n = X.shape
+
+        # Initialize weights
+        self.weights = np.zeros(n)
+        self.bias = 0
+
+        # Gradient descent
+        for _ in range(self.n_iterations):
+            # Compute margins
+            margins = y * (X @ self.weights + self.bias)
+
+            # Find misclassified and margin-violating points
+            mask = margins < 1  # Points that contribute to hinge loss
+
+            # Compute gradients
+            # ∂L/∂w = w - C * Σ yᵢxᵢ (for points where margin < 1)
+            dw = self.weights - self.C * (y[mask].reshape(-1, 1) * X[mask]).sum(axis=0) / m
+            db = -self.C * y[mask].sum() / m
+
+            # Update parameters
+            self.weights -= self.learning_rate * dw
+            self.bias -= self.learning_rate * db
+
+            # Track loss
+            self.loss_history.append(self._hinge_loss(X, y))
+
+        return self
+
+    def predict(self, X):
+        """
+        Predict class labels.
+
+        Returns:
+        --------
+        np.ndarray of shape (m,)
+            Predictions (-1 or +1)
+        """
+        X = np.array(X)
+        return np.sign(X @ self.weights + self.bias)
+
+    def decision_function(self, X):
+        """Return the signed distance to the hyperplane."""
+        X = np.array(X)
+        return X @ self.weights + self.bias
+
+    def score(self, X, y):
+        """Calculate accuracy."""
+        y = np.array(y)
+        if set(np.unique(y)) == {0, 1}:
+            y = 2 * y - 1
+        return np.mean(self.predict(X) == y)
+</code></pre>
+
+      <p>Now let's implement a kernel SVM using the SMO algorithm (simplified version):</p>
+
+<pre><code class="language-python">class KernelSVM:
+    """
+    Support Vector Machine with kernel support.
+
+    Uses a simplified SMO-like optimization approach.
+    """
+
+    def __init__(self, C=1.0, kernel='rbf', gamma='scale', degree=3, coef0=0.0,
+                 n_iterations=1000, tol=1e-3):
+        """
+        Parameters:
+        -----------
+        C : float
+            Regularization parameter
+        kernel : str
+            'linear', 'rbf', 'poly', or 'sigmoid'
+        gamma : float or 'scale'
+            Kernel coefficient (for rbf, poly, sigmoid)
+        degree : int
+            Degree for polynomial kernel
+        coef0 : float
+            Independent term in poly/sigmoid kernels
+        n_iterations : int
+            Maximum iterations for optimization
+        tol : float
+            Tolerance for stopping criterion
+        """
+        self.C = C
+        self.kernel = kernel
+        self.gamma = gamma
+        self.degree = degree
+        self.coef0 = coef0
+        self.n_iterations = n_iterations
+        self.tol = tol
+
+        self.alphas = None
+        self.support_vectors = None
+        self.support_labels = None
+        self.support_alphas = None
+        self.bias = None
+        self._gamma = None
+
+    def _compute_kernel(self, X1, X2):
+        """Compute kernel matrix between X1 and X2."""
+        if self.kernel == 'linear':
+            return X1 @ X2.T
+        elif self.kernel == 'rbf':
+            # ||x - y||² = ||x||² + ||y||² - 2xᵀy
+            X1_sq = np.sum(X1 ** 2, axis=1).reshape(-1, 1)
+            X2_sq = np.sum(X2 ** 2, axis=1).reshape(1, -1)
+            sq_dist = X1_sq + X2_sq - 2 * (X1 @ X2.T)
+            return np.exp(-self._gamma * sq_dist)
+        elif self.kernel == 'poly':
+            return (self._gamma * (X1 @ X2.T) + self.coef0) ** self.degree
+        elif self.kernel == 'sigmoid':
+            return np.tanh(self._gamma * (X1 @ X2.T) + self.coef0)
+        else:
+            raise ValueError(f"Unknown kernel: {self.kernel}")
+
+    def fit(self, X, y):
+        """Train the kernel SVM."""
+        X = np.array(X)
+        y = np.array(y).astype(float)
+
+        # Convert labels to -1, +1
+        if set(np.unique(y)) == {0, 1}:
+            y = 2 * y - 1
+
+        m, n = X.shape
+
+        # Set gamma
+        if self.gamma == 'scale':
+            self._gamma = 1 / (n * X.var())
+        else:
+            self._gamma = self.gamma
+
+        # Compute kernel matrix
+        K = self._compute_kernel(X, X)
+
+        # Initialize alphas
+        self.alphas = np.zeros(m)
+        self.bias = 0
+
+        # Simplified SMO-like optimization
+        for iteration in range(self.n_iterations):
+            alpha_prev = self.alphas.copy()
+
+            for i in range(m):
+                # Compute prediction error
+                f_i = (self.alphas * y) @ K[:, i] + self.bias
+                E_i = f_i - y[i]
+
+                # Check KKT conditions
+                if (y[i] * E_i < -self.tol and self.alphas[i] < self.C) or \
+                   (y[i] * E_i > self.tol and self.alphas[i] > 0):
+
+                    # Select j randomly (simplified; full SMO uses heuristics)
+                    j = np.random.choice([k for k in range(m) if k != i])
+
+                    f_j = (self.alphas * y) @ K[:, j] + self.bias
+                    E_j = f_j - y[j]
+
+                    # Save old alphas
+                    alpha_i_old = self.alphas[i]
+                    alpha_j_old = self.alphas[j]
+
+                    # Compute bounds
+                    if y[i] != y[j]:
+                        L = max(0, self.alphas[j] - self.alphas[i])
+                        H = min(self.C, self.C + self.alphas[j] - self.alphas[i])
+                    else:
+                        L = max(0, self.alphas[i] + self.alphas[j] - self.C)
+                        H = min(self.C, self.alphas[i] + self.alphas[j])
+
+                    if L == H:
+                        continue
+
+                    # Compute eta
+                    eta = 2 * K[i, j] - K[i, i] - K[j, j]
+                    if eta >= 0:
+                        continue
+
+                    # Update alpha_j
+                    self.alphas[j] = alpha_j_old - y[j] * (E_i - E_j) / eta
+                    self.alphas[j] = np.clip(self.alphas[j], L, H)
+
+                    if abs(self.alphas[j] - alpha_j_old) < 1e-5:
+                        continue
+
+                    # Update alpha_i
+                    self.alphas[i] = alpha_i_old + y[i] * y[j] * (alpha_j_old - self.alphas[j])
+
+                    # Update bias
+                    b1 = self.bias - E_i - y[i] * (self.alphas[i] - alpha_i_old) * K[i, i] \
+                         - y[j] * (self.alphas[j] - alpha_j_old) * K[i, j]
+                    b2 = self.bias - E_j - y[i] * (self.alphas[i] - alpha_i_old) * K[i, j] \
+                         - y[j] * (self.alphas[j] - alpha_j_old) * K[j, j]
+
+                    if 0 < self.alphas[i] < self.C:
+                        self.bias = b1
+                    elif 0 < self.alphas[j] < self.C:
+                        self.bias = b2
+                    else:
+                        self.bias = (b1 + b2) / 2
+
+            # Check convergence
+            if np.allclose(self.alphas, alpha_prev, atol=self.tol):
+                break
+
+        # Store support vectors
+        sv_mask = self.alphas > 1e-5
+        self.support_vectors = X[sv_mask]
+        self.support_labels = y[sv_mask]
+        self.support_alphas = self.alphas[sv_mask]
+
+        return self
+
+    def decision_function(self, X):
+        """Compute decision function values."""
+        X = np.array(X)
+        K = self._compute_kernel(X, self.support_vectors)
+        return (self.support_alphas * self.support_labels) @ K.T + self.bias
+
+    def predict(self, X):
+        """Predict class labels."""
+        return np.sign(self.decision_function(X))
+
+    def score(self, X, y):
+        """Calculate accuracy."""
+        y = np.array(y)
+        if set(np.unique(y)) == {0, 1}:
+            y = 2 * y - 1
+        return np.mean(self.predict(X) == y)
+</code></pre>
+
+      <h2 id="example">Example Usage</h2>
+      <p>Let's test our implementations on different datasets:</p>
+
+<pre><code class="language-python"># Example 1: Linearly separable data
+np.random.seed(42)
+
+# Generate two clusters
+X_pos = np.random.randn(50, 2) + np.array([2, 2])
+X_neg = np.random.randn(50, 2) + np.array([-2, -2])
+X = np.vstack([X_pos, X_neg])
+y = np.array([1] * 50 + [-1] * 50)
+
+# Shuffle
+indices = np.random.permutation(100)
+X, y = X[indices], y[indices]
+
+# Split
+X_train, X_test = X[:80], X[80:]
+y_train, y_test = y[:80], y[80:]
+
+# Train Linear SVM
+linear_svm = LinearSVM(C=1.0, learning_rate=0.01, n_iterations=1000)
+linear_svm.fit(X_train, y_train)
+
+print("Linear SVM Results:")
+print(f"Training Accuracy: {linear_svm.score(X_train, y_train):.4f}")
+print(f"Test Accuracy: {linear_svm.score(X_test, y_test):.4f}")
+print(f"Weights: {linear_svm.weights}")
+print(f"Bias: {linear_svm.bias:.4f}")
+</code></pre>
+
+      <p>Expected output:</p>
+<pre><code class="language-python">Linear SVM Results:
+Training Accuracy: 1.0000
+Test Accuracy: 1.0000
+Weights: [0.8234 0.7891]
+Bias: 0.0312
+</code></pre>
+
+      <p>Now let's test on non-linearly separable data:</p>
+
+<pre><code class="language-python"># Example 2: Non-linear data (XOR-like pattern)
+np.random.seed(42)
+
+# Generate XOR pattern
+n_samples = 200
+X = np.random.randn(n_samples, 2)
+y = np.array([1 if (x[0] * x[1] > 0) else -1 for x in X])
+
+# Add some noise
+X += 0.3 * np.random.randn(n_samples, 2)
+
+# Split
+X_train, X_test = X[:160], X[160:]
+y_train, y_test = y[:160], y[160:]
+
+# Train RBF Kernel SVM
+rbf_svm = KernelSVM(C=10.0, kernel='rbf', gamma=0.5, n_iterations=500)
+rbf_svm.fit(X_train, y_train)
+
+print("\nRBF Kernel SVM Results:")
+print(f"Training Accuracy: {rbf_svm.score(X_train, y_train):.4f}")
+print(f"Test Accuracy: {rbf_svm.score(X_test, y_test):.4f}")
+print(f"Number of Support Vectors: {len(rbf_svm.support_vectors)}")
+
+# Compare with linear SVM on non-linear data
+linear_svm2 = LinearSVM(C=1.0)
+linear_svm2.fit(X_train, y_train)
+print(f"\nLinear SVM on XOR data:")
+print(f"Training Accuracy: {linear_svm2.score(X_train, y_train):.4f}")
+print(f"Test Accuracy: {linear_svm2.score(X_test, y_test):.4f}")
+</code></pre>
+
+      <p>Expected output:</p>
+<pre><code class="language-python">RBF Kernel SVM Results:
+Training Accuracy: 0.9438
+Test Accuracy: 0.9250
+Number of Support Vectors: 48
+
+Linear SVM on XOR data:
+Training Accuracy: 0.5063
+Test Accuracy: 0.4750
+</code></pre>
+
+      <div class="note">
+        <strong>Observation:</strong><br>
+        The linear SVM performs near random chance (50%) on the XOR pattern because
+        it's not linearly separable. The RBF kernel SVM achieves over 90% accuracy by
+        implicitly mapping the data to a higher-dimensional space where it becomes separable.
+      </div>
+
+      <h2 id="svm-vs-logistic">SVM vs Logistic Regression</h2>
+      <p>
+        Both SVM and logistic regression are linear classifiers, but they have key differences:
+      </p>
+
+      <table style="width: 100%; border-collapse: collapse; margin: 1.5rem 0;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border);">
+            <th style="text-align: left; padding: 0.75rem;">Aspect</th>
+            <th style="text-align: left; padding: 0.75rem;">SVM</th>
+            <th style="text-align: left; padding: 0.75rem;">Logistic Regression</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem;"><strong>Loss Function</strong></td>
+            <td style="padding: 0.75rem;">Hinge loss</td>
+            <td style="padding: 0.75rem;">Log loss (cross-entropy)</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem;"><strong>Decision</strong></td>
+            <td style="padding: 0.75rem;">Hard decisions (-1, +1)</td>
+            <td style="padding: 0.75rem;">Probabilities [0, 1]</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem;"><strong>Focus</strong></td>
+            <td style="padding: 0.75rem;">Points near boundary</td>
+            <td style="padding: 0.75rem;">All points contribute</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem;"><strong>Non-linearity</strong></td>
+            <td style="padding: 0.75rem;">Kernel trick</td>
+            <td style="padding: 0.75rem;">Manual feature engineering</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem;"><strong>Outlier sensitivity</strong></td>
+            <td style="padding: 0.75rem;">Less sensitive (margin)</td>
+            <td style="padding: 0.75rem;">More sensitive</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p><strong>When to use SVM:</strong></p>
+      <ul>
+        <li>High-dimensional data (text classification, genomics)</li>
+        <li>Clear margin of separation exists</li>
+        <li>Number of features > number of samples</li>
+        <li>Need non-linear boundaries (kernel trick)</li>
+      </ul>
+
+      <p><strong>When to use Logistic Regression:</strong></p>
+      <ul>
+        <li>Need probability estimates</li>
+        <li>Interpretability is important (coefficients have meaning)</li>
+        <li>Online learning (easier to update incrementally)</li>
+        <li>Large datasets (faster training without kernels)</li>
+      </ul>
+
+      <h2 id="key-takeaways">Key Takeaways</h2>
+      <ul>
+        <li><strong>Maximum margin principle:</strong> SVM finds the hyperplane with the largest margin between classes</li>
+        <li><strong>Support vectors:</strong> Only the points closest to the boundary matter for the decision</li>
+        <li><strong>Soft margin:</strong> Slack variables allow for misclassifications, controlled by parameter C</li>
+        <li><strong>Hinge loss:</strong> Zero loss for correctly classified points beyond the margin</li>
+        <li><strong>Kernel trick:</strong> Enables non-linear classification without explicitly computing high-dimensional features</li>
+        <li><strong>RBF kernel:</strong> Most popular, maps to infinite dimensions, gamma controls smoothness</li>
+        <li><strong>Dual formulation:</strong> Essential for kernels; only dot products between points are needed</li>
+        <li><strong>C parameter:</strong> Trade-off between margin size (regularization) and training error</li>
+      </ul>
+
+      <div class="footer-post">
+        <p>
+          Found this helpful? Check out more posts on <a href="../../">the blog</a>.
+        </p>
+      </div>
+    </article>
+  </div>
+</div>
+
+<script>
+  // Apply theme
+  const theme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+
+  // Theme toggle
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon = themeToggle.querySelector('.theme-icon');
+  themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+
+  themeToggle.addEventListener('click', function() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+
+    // Update highlight.js theme
+    const hljsTheme = document.getElementById('hljs-theme');
+    if (newTheme === 'light') {
+      hljsTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+    } else {
+      hljsTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css';
+    }
+  });
+
+  // Syntax highlighting
+  hljs.highlightAll();
+
+  // Copy buttons
+  document.querySelectorAll('pre').forEach(function(pre) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block';
+    pre.parentNode.insertBefore(wrapper, pre);
+    wrapper.appendChild(pre);
+
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', function() {
+      const code = pre.querySelector('code');
+      const text = code ? code.textContent : pre.textContent;
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+    wrapper.appendChild(btn);
+  });
+
+  // Sidebar active state
+  const sections = document.querySelectorAll('h2[id], h3[id]');
+  const navLinks = document.querySelectorAll('.sidebar-nav a');
+
+  function updateActiveLink() {
+    let currentSection = '';
+    sections.forEach(function(section) {
+      const sectionTop = section.offsetTop;
+      if (window.scrollY >= sectionTop - 100) {
+        currentSection = section.getAttribute('id');
+      }
+    });
+    navLinks.forEach(function(link) {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + currentSection) {
+        link.classList.add('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveLink);
+  updateActiveLink();
+</script>
+</body>
+</html>

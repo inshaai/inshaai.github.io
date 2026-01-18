@@ -1,5 +1,14 @@
 [
   {
+    "id": "support-vector-machines",
+    "title": "Support Vector Machines From Scratch",
+    "date": "2026-01-17",
+    "tags": ["machine-learning", "classification", "python"],
+    "excerpt": "Complete guide to SVMs: maximum margin classifiers, kernel trick, soft margins, and Python implementation from scratch.",
+    "url": "./posts/2026-01-17-support-vector-machines/",
+    "readingTime": 25
+  },
+  {
     "id": "welcome",
     "title": "Welcome",
     "date": "2026-01-16",
