@@ -218,6 +218,13 @@
         <li><a href="#templates">Templates</a></li>
         <li class="sub-item"><a href="#template-tags">Template Tags</a></li>
         <li><a href="#admin">Admin Interface</a></li>
+        <li><a href="#forms">Forms</a></li>
+        <li class="sub-item"><a href="#form-validation">Validation</a></li>
+        <li class="sub-item"><a href="#modelforms">ModelForms</a></li>
+        <li><a href="#authentication">Authentication</a></li>
+        <li class="sub-item"><a href="#login-logout">Login/Logout</a></li>
+        <li class="sub-item"><a href="#registration">Registration</a></li>
+        <li class="sub-item"><a href="#protecting-views">Protecting Views</a></li>
         <li><a href="#running">Running the Server</a></li>
         <li><a href="#reference">Quick Reference</a></li>
         <li><a href="#next-steps">Next Steps</a></li>
@@ -959,6 +966,535 @@ class PostAdmin(admin.ModelAdmin):
         <li>Email (optional)</li>
         <li>Password</li>
       </ul>
+
+      <h2 id="forms">Forms</h2>
+      <p>
+        Django's form system handles HTML form rendering, data validation, and processing.
+        Forms can be created manually or generated automatically from models.
+      </p>
+
+      <h3>Step 17: Create a Basic Form</h3>
+      <p>Create <code>blog/forms.py</code>:</p>
+
+<pre><code class="language-python">from django import forms
+
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    email = forms.EmailField()
+    message = forms.CharField(widget=forms.Textarea)
+
+    # Optional: Add custom attributes
+    name = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Your name'
+        })
+    )</code></pre>
+
+      <h3>Form Field Types</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Field Type</th>
+            <th>HTML Element</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>CharField</code></td>
+            <td><code>&lt;input type="text"&gt;</code></td>
+            <td>Single-line text input</td>
+          </tr>
+          <tr>
+            <td><code>EmailField</code></td>
+            <td><code>&lt;input type="email"&gt;</code></td>
+            <td>Email with validation</td>
+          </tr>
+          <tr>
+            <td><code>IntegerField</code></td>
+            <td><code>&lt;input type="number"&gt;</code></td>
+            <td>Integer input</td>
+          </tr>
+          <tr>
+            <td><code>BooleanField</code></td>
+            <td><code>&lt;input type="checkbox"&gt;</code></td>
+            <td>Checkbox</td>
+          </tr>
+          <tr>
+            <td><code>ChoiceField</code></td>
+            <td><code>&lt;select&gt;</code></td>
+            <td>Dropdown select</td>
+          </tr>
+          <tr>
+            <td><code>DateField</code></td>
+            <td><code>&lt;input type="text"&gt;</code></td>
+            <td>Date input</td>
+          </tr>
+          <tr>
+            <td><code>FileField</code></td>
+            <td><code>&lt;input type="file"&gt;</code></td>
+            <td>File upload</td>
+          </tr>
+          <tr>
+            <td><code>ImageField</code></td>
+            <td><code>&lt;input type="file"&gt;</code></td>
+            <td>Image upload with validation</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Step 18: Create View to Handle Form</h3>
+      <p>Add to <code>blog/views.py</code>:</p>
+
+<pre><code class="language-python">from django.shortcuts import render, redirect
+from .forms import ContactForm
+
+def contact(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            # Process the data
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            message = form.cleaned_data['message']
+
+            # Do something with the data (send email, save to DB, etc.)
+            # send_email(name, email, message)
+
+            return redirect('contact_success')
+    else:
+        form = ContactForm()
+
+    return render(request, 'blog/contact.html', {'form': form})</code></pre>
+
+      <h3>Step 19: Create Form Template</h3>
+      <p>Create <code>blog/templates/blog/contact.html</code>:</p>
+
+<pre><code class="language-html">&lt;form method="post"&gt;
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    &lt;button type="submit"&gt;Send Message&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;!-- Or render fields manually for more control --&gt;
+&lt;form method="post"&gt;
+    {% csrf_token %}
+
+    &lt;div class="form-group"&gt;
+        &lt;label for="{{ form.name.id_for_label }}"&gt;Name:&lt;/label&gt;
+        {{ form.name }}
+        {% if form.name.errors %}
+            &lt;span class="error"&gt;{{ form.name.errors }}&lt;/span&gt;
+        {% endif %}
+    &lt;/div&gt;
+
+    &lt;div class="form-group"&gt;
+        &lt;label for="{{ form.email.id_for_label }}"&gt;Email:&lt;/label&gt;
+        {{ form.email }}
+    &lt;/div&gt;
+
+    &lt;div class="form-group"&gt;
+        &lt;label for="{{ form.message.id_for_label }}"&gt;Message:&lt;/label&gt;
+        {{ form.message }}
+    &lt;/div&gt;
+
+    &lt;button type="submit"&gt;Send&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+
+      <h3>Form Rendering Options</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>{{ form.as_p }}</code></td>
+            <td>Render each field wrapped in &lt;p&gt; tags</td>
+          </tr>
+          <tr>
+            <td><code>{{ form.as_table }}</code></td>
+            <td>Render as table rows</td>
+          </tr>
+          <tr>
+            <td><code>{{ form.as_ul }}</code></td>
+            <td>Render as list items</td>
+          </tr>
+          <tr>
+            <td><code>{{ form.field_name }}</code></td>
+            <td>Render individual field</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="form-validation">Form Validation</h3>
+      <p>Add custom validation to your forms:</p>
+
+<pre><code class="language-python">from django import forms
+from django.core.exceptions import ValidationError
+
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    email = forms.EmailField()
+    message = forms.CharField(widget=forms.Textarea, min_length=10)
+
+    # Field-level validation
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if not email.endswith('@example.com'):
+            raise ValidationError('Please use a company email address.')
+        return email
+
+    # Form-level validation (multiple fields)
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get('name')
+        message = cleaned_data.get('message')
+
+        if name and message:
+            if name.lower() in message.lower():
+                raise ValidationError(
+                    "Please don't include your name in the message."
+                )
+
+        return cleaned_data</code></pre>
+
+      <div class="note">
+        <strong>Validation Order:</strong>
+        <ol>
+          <li><code>to_python()</code> - Convert to Python type</li>
+          <li><code>validate()</code> - Field-specific validation</li>
+          <li><code>run_validators()</code> - Run field validators</li>
+          <li><code>clean_&lt;fieldname&gt;()</code> - Custom field validation</li>
+          <li><code>clean()</code> - Form-wide validation</li>
+        </ol>
+      </div>
+
+      <h3 id="modelforms">ModelForms</h3>
+      <p>Automatically create forms from models:</p>
+
+<pre><code class="language-python">from django import forms
+from .models import Post
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['title', 'content', 'published']
+        # Or exclude specific fields:
+        # exclude = ['created_at']
+
+        # Customize widgets
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'content': forms.Textarea(attrs={'rows': 10}),
+        }
+
+        # Custom labels
+        labels = {
+            'title': 'Post Title',
+            'content': 'Post Content',
+        }
+
+        # Help text
+        help_texts = {
+            'title': 'Enter a descriptive title',
+        }</code></pre>
+
+      <h3>Using ModelForm in Views</h3>
+
+<pre><code class="language-python">from django.shortcuts import render, redirect, get_object_or_404
+from .forms import PostForm
+from .models import Post
+
+def post_create(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save()  # Creates and saves the model instance
+            return redirect('post_detail', pk=post.pk)
+    else:
+        form = PostForm()
+    return render(request, 'blog/post_form.html', {'form': form})
+
+def post_update(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()  # Updates the existing instance
+            return redirect('post_detail', pk=post.pk)
+    else:
+        form = PostForm(instance=post)
+    return render(request, 'blog/post_form.html', {'form': form})</code></pre>
+
+      <h2 id="authentication">Authentication</h2>
+      <p>
+        Django provides a complete authentication system out of the box, including
+        user accounts, groups, permissions, and cookie-based user sessions.
+      </p>
+
+      <h3>Authentication Setup</h3>
+      <p>The authentication system is included by default. Verify in <code>settings.py</code>:</p>
+
+<pre><code class="language-python">INSTALLED_APPS = [
+    'django.contrib.auth',          # Core authentication
+    'django.contrib.contenttypes',  # Content type system
+    'django.contrib.sessions',      # Session framework
+    # ...
+]
+
+MIDDLEWARE = [
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # ...
+]</code></pre>
+
+      <h3 id="login-logout">Step 20: Login and Logout Views</h3>
+      <p>Django provides built-in views. Add to <code>myproject/urls.py</code>:</p>
+
+<pre><code class="language-python">from django.contrib import admin
+from django.urls import path, include
+from django.contrib.auth import views as auth_views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('blog.urls')),
+
+    # Authentication URLs
+    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+]</code></pre>
+
+      <h3>Create Login Template</h3>
+      <p>Create <code>templates/registration/login.html</code> (in project root):</p>
+
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Login&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Login&lt;/h1&gt;
+
+    {% if form.errors %}
+        &lt;p class="error"&gt;Invalid username or password.&lt;/p&gt;
+    {% endif %}
+
+    &lt;form method="post"&gt;
+        {% csrf_token %}
+
+        &lt;div&gt;
+            &lt;label for="id_username"&gt;Username:&lt;/label&gt;
+            {{ form.username }}
+        &lt;/div&gt;
+
+        &lt;div&gt;
+            &lt;label for="id_password"&gt;Password:&lt;/label&gt;
+            {{ form.password }}
+        &lt;/div&gt;
+
+        &lt;button type="submit"&gt;Login&lt;/button&gt;
+    &lt;/form&gt;
+
+    &lt;p&gt;Don't have an account? &lt;a href="{% url 'register' %}"&gt;Register&lt;/a&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+      <h3>Configure Template Directory</h3>
+      <p>Add to <code>settings.py</code>:</p>
+
+<pre><code class="language-python">TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],  # Add this line
+        'APP_DIRS': True,
+        # ...
+    },
+]
+
+# Redirect after login/logout
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'</code></pre>
+
+      <h3 id="registration">Step 21: User Registration</h3>
+      <p>Create a registration form in <code>blog/forms.py</code>:</p>
+
+<pre><code class="language-python">from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+
+class RegistrationForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+    first_name = forms.CharField(max_length=30, required=False)
+    last_name = forms.CharField(max_length=30, required=False)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name',
+                  'password1', 'password2']
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        if commit:
+            user.save()
+        return user</code></pre>
+
+      <h3>Registration View</h3>
+      <p>Add to <code>blog/views.py</code>:</p>
+
+<pre><code class="language-python">from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from .forms import RegistrationForm
+
+def register(request):
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # Log in the user immediately
+            return redirect('post_list')
+    else:
+        form = RegistrationForm()
+    return render(request, 'registration/register.html', {'form': form})</code></pre>
+
+      <h3>Registration Template</h3>
+      <p>Create <code>templates/registration/register.html</code>:</p>
+
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Register&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Create Account&lt;/h1&gt;
+
+    &lt;form method="post"&gt;
+        {% csrf_token %}
+        {{ form.as_p }}
+        &lt;button type="submit"&gt;Register&lt;/button&gt;
+    &lt;/form&gt;
+
+    &lt;p&gt;Already have an account? &lt;a href="{% url 'login' %}"&gt;Login&lt;/a&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+      <h3>Add Registration URL</h3>
+      <p>Add to <code>blog/urls.py</code>:</p>
+
+<pre><code class="language-python">from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.post_list, name='post_list'),
+    path('post/&lt;int:pk&gt;/', views.post_detail, name='post_detail'),
+    path('register/', views.register, name='register'),
+]</code></pre>
+
+      <h3 id="protecting-views">Step 22: Protecting Views</h3>
+      <p>Require login for certain views:</p>
+
+<pre><code class="language-python">from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+
+# Function-based view
+@login_required
+def create_post(request):
+    # Only authenticated users can access this
+    return render(request, 'blog/post_form.html')
+
+# With custom login URL
+@login_required(login_url='/custom-login/')
+def my_view(request):
+    pass</code></pre>
+
+      <h3>Permission Decorators</h3>
+
+<pre><code class="language-python">from django.contrib.auth.decorators import permission_required, user_passes_test
+
+# Require specific permission
+@permission_required('blog.add_post')
+def create_post(request):
+    pass
+
+# Require multiple permissions
+@permission_required(['blog.add_post', 'blog.change_post'])
+def manage_posts(request):
+    pass
+
+# Custom test
+def is_editor(user):
+    return user.groups.filter(name='Editors').exists()
+
+@user_passes_test(is_editor)
+def editor_dashboard(request):
+    pass</code></pre>
+
+      <h3>User Info in Templates</h3>
+      <p>Access the current user in any template:</p>
+
+<pre><code class="language-html">{% if user.is_authenticated %}
+    &lt;p&gt;Welcome, {{ user.username }}!&lt;/p&gt;
+    &lt;a href="{% url 'logout' %}"&gt;Logout&lt;/a&gt;
+{% else %}
+    &lt;a href="{% url 'login' %}"&gt;Login&lt;/a&gt;
+    &lt;a href="{% url 'register' %}"&gt;Register&lt;/a&gt;
+{% endif %}
+
+&lt;!-- Check permissions --&gt;
+{% if perms.blog.add_post %}
+    &lt;a href="{% url 'post_create' %}"&gt;Create New Post&lt;/a&gt;
+{% endif %}
+
+&lt;!-- Check if user is staff --&gt;
+{% if user.is_staff %}
+    &lt;a href="/admin/"&gt;Admin Panel&lt;/a&gt;
+{% endif %}</code></pre>
+
+      <h3>Class-Based Views with Authentication</h3>
+
+<pre><code class="language-python">from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.views.generic import CreateView
+from .models import Post
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    fields = ['title', 'content']
+    template_name = 'blog/post_form.html'
+
+    # Optional: customize login redirect
+    login_url = '/login/'
+    redirect_field_name = 'next'
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+class PostDeleteView(PermissionRequiredMixin, DeleteView):
+    model = Post
+    permission_required = 'blog.delete_post'
+    success_url = '/'</code></pre>
+
+      <div class="note">
+        <strong>Security Best Practices:</strong>
+        <ul>
+          <li>Always use <code>{% csrf_token %}</code> in forms</li>
+          <li>Use HTTPS in production</li>
+          <li>Set <code>SESSION_COOKIE_SECURE = True</code> in production</li>
+          <li>Use strong password validation (enabled by default)</li>
+          <li>Never store passwords in plain text</li>
+        </ul>
+      </div>
 
       <h2 id="running">Running the Server</h2>
 
