@@ -219,7 +219,13 @@
         <li class="sub-item"><a href="#template-tags">Template Tags</a></li>
         <li><a href="#admin">Admin Interface</a></li>
         <li><a href="#forms">Forms</a></li>
+        <li class="sub-item"><a href="#field-options">Field Options</a></li>
+        <li class="sub-item"><a href="#widgets">Widgets</a></li>
+        <li class="sub-item"><a href="#choice-fields">Choice Fields</a></li>
+        <li class="sub-item"><a href="#file-uploads">File Uploads</a></li>
         <li class="sub-item"><a href="#form-validation">Validation</a></li>
+        <li class="sub-item"><a href="#error-handling">Error Handling</a></li>
+        <li class="sub-item"><a href="#formsets">Formsets</a></li>
         <li class="sub-item"><a href="#modelforms">ModelForms</a></li>
         <li><a href="#authentication">Authentication</a></li>
         <li class="sub-item"><a href="#login-logout">Login/Logout</a></li>
@@ -1043,8 +1049,514 @@ class ContactForm(forms.Form):
             <td><code>&lt;input type="file"&gt;</code></td>
             <td>Image upload with validation</td>
           </tr>
+          <tr>
+            <td><code>URLField</code></td>
+            <td><code>&lt;input type="url"&gt;</code></td>
+            <td>URL with validation</td>
+          </tr>
+          <tr>
+            <td><code>SlugField</code></td>
+            <td><code>&lt;input type="text"&gt;</code></td>
+            <td>Slug (letters, numbers, hyphens, underscores)</td>
+          </tr>
+          <tr>
+            <td><code>DecimalField</code></td>
+            <td><code>&lt;input type="number"&gt;</code></td>
+            <td>Decimal numbers with precision</td>
+          </tr>
+          <tr>
+            <td><code>TimeField</code></td>
+            <td><code>&lt;input type="text"&gt;</code></td>
+            <td>Time input</td>
+          </tr>
+          <tr>
+            <td><code>DateTimeField</code></td>
+            <td><code>&lt;input type="text"&gt;</code></td>
+            <td>Date and time input</td>
+          </tr>
+          <tr>
+            <td><code>MultipleChoiceField</code></td>
+            <td><code>&lt;select multiple&gt;</code></td>
+            <td>Multiple selection</td>
+          </tr>
+          <tr>
+            <td><code>TypedChoiceField</code></td>
+            <td><code>&lt;select&gt;</code></td>
+            <td>Choice with type coercion</td>
+          </tr>
         </tbody>
       </table>
+
+      <h3 id="field-options">Field Options (Arguments)</h3>
+      <p>All form fields accept these common arguments:</p>
+
+<pre><code class="language-python">from django import forms
+
+class ExampleForm(forms.Form):
+    # Required field (default)
+    username = forms.CharField(
+        required=True,           # Field must have a value (default: True)
+        max_length=100,          # Maximum length for CharField
+        min_length=3,            # Minimum length for CharField
+    )
+
+    # Optional field with default value
+    country = forms.CharField(
+        required=False,          # Field can be empty
+        initial='United States', # Default value shown in form
+        empty_value='',          # Value if left empty
+    )
+
+    # Field with help text and custom label
+    email = forms.EmailField(
+        label='Email Address',   # Custom label (default: field name)
+        help_text='We will never share your email.',
+    )
+
+    # Field with custom error messages
+    password = forms.CharField(
+        widget=forms.PasswordInput,
+        error_messages={
+            'required': 'Please enter a password.',
+            'min_length': 'Password must be at least 8 characters.',
+        },
+        min_length=8,
+    )
+
+    # Disabled field (cannot be modified)
+    account_id = forms.CharField(
+        disabled=True,           # Read-only, value not submitted
+        initial='ACC-12345',
+    )
+
+    # Field with custom validators
+    age = forms.IntegerField(
+        validators=[MinValueValidator(18), MaxValueValidator(120)],
+    )</code></pre>
+
+      <h3>Field Options Reference</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Description</th>
+            <th>Default</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>required</code></td>
+            <td>Whether the field must have a value</td>
+            <td><code>True</code></td>
+          </tr>
+          <tr>
+            <td><code>label</code></td>
+            <td>Label text for the field</td>
+            <td>Field name (capitalized)</td>
+          </tr>
+          <tr>
+            <td><code>initial</code></td>
+            <td>Initial value displayed in form</td>
+            <td><code>None</code></td>
+          </tr>
+          <tr>
+            <td><code>widget</code></td>
+            <td>Widget class to use for rendering</td>
+            <td>Field-specific default</td>
+          </tr>
+          <tr>
+            <td><code>help_text</code></td>
+            <td>Descriptive text shown with field</td>
+            <td><code>''</code></td>
+          </tr>
+          <tr>
+            <td><code>error_messages</code></td>
+            <td>Dict of custom error messages</td>
+            <td><code>{}</code></td>
+          </tr>
+          <tr>
+            <td><code>validators</code></td>
+            <td>List of validation functions</td>
+            <td><code>[]</code></td>
+          </tr>
+          <tr>
+            <td><code>disabled</code></td>
+            <td>Render field as disabled</td>
+            <td><code>False</code></td>
+          </tr>
+          <tr>
+            <td><code>localize</code></td>
+            <td>Enable localization of data</td>
+            <td><code>False</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="widgets">Widgets</h3>
+      <p>
+        Widgets control how form fields are rendered as HTML. You can customize
+        the HTML output by specifying a different widget or adding attributes.
+      </p>
+
+<pre><code class="language-python">from django import forms
+
+class StyledForm(forms.Form):
+    # Text input with CSS class and placeholder
+    name = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your name',
+            'id': 'name-field',
+            'autofocus': True,
+        })
+    )
+
+    # Password input
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'autocomplete': 'new-password',
+        })
+    )
+
+    # Textarea with rows and cols
+    bio = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'rows': 5,
+            'cols': 40,
+            'class': 'form-control',
+            'placeholder': 'Tell us about yourself...',
+        })
+    )
+
+    # Hidden input
+    user_id = forms.IntegerField(
+        widget=forms.HiddenInput()
+    )
+
+    # Email input
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+        })
+    )
+
+    # Number input with min/max
+    quantity = forms.IntegerField(
+        widget=forms.NumberInput(attrs={
+            'min': 1,
+            'max': 100,
+            'step': 1,
+        })
+    )
+
+    # Date picker
+    birth_date = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'type': 'date',  # HTML5 date picker
+            'class': 'form-control',
+        })
+    )
+
+    # Checkbox
+    agree = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input',
+        })
+    )</code></pre>
+
+      <h3>Widget Types Reference</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Widget</th>
+            <th>HTML Output</th>
+            <th>Used For</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>TextInput</code></td>
+            <td><code>&lt;input type="text"&gt;</code></td>
+            <td>CharField</td>
+          </tr>
+          <tr>
+            <td><code>PasswordInput</code></td>
+            <td><code>&lt;input type="password"&gt;</code></td>
+            <td>Password fields</td>
+          </tr>
+          <tr>
+            <td><code>HiddenInput</code></td>
+            <td><code>&lt;input type="hidden"&gt;</code></td>
+            <td>Hidden data</td>
+          </tr>
+          <tr>
+            <td><code>Textarea</code></td>
+            <td><code>&lt;textarea&gt;</code></td>
+            <td>Long text</td>
+          </tr>
+          <tr>
+            <td><code>EmailInput</code></td>
+            <td><code>&lt;input type="email"&gt;</code></td>
+            <td>EmailField</td>
+          </tr>
+          <tr>
+            <td><code>URLInput</code></td>
+            <td><code>&lt;input type="url"&gt;</code></td>
+            <td>URLField</td>
+          </tr>
+          <tr>
+            <td><code>NumberInput</code></td>
+            <td><code>&lt;input type="number"&gt;</code></td>
+            <td>IntegerField, DecimalField</td>
+          </tr>
+          <tr>
+            <td><code>DateInput</code></td>
+            <td><code>&lt;input type="text"&gt;</code></td>
+            <td>DateField</td>
+          </tr>
+          <tr>
+            <td><code>DateTimeInput</code></td>
+            <td><code>&lt;input type="text"&gt;</code></td>
+            <td>DateTimeField</td>
+          </tr>
+          <tr>
+            <td><code>TimeInput</code></td>
+            <td><code>&lt;input type="text"&gt;</code></td>
+            <td>TimeField</td>
+          </tr>
+          <tr>
+            <td><code>CheckboxInput</code></td>
+            <td><code>&lt;input type="checkbox"&gt;</code></td>
+            <td>BooleanField</td>
+          </tr>
+          <tr>
+            <td><code>Select</code></td>
+            <td><code>&lt;select&gt;</code></td>
+            <td>ChoiceField</td>
+          </tr>
+          <tr>
+            <td><code>SelectMultiple</code></td>
+            <td><code>&lt;select multiple&gt;</code></td>
+            <td>MultipleChoiceField</td>
+          </tr>
+          <tr>
+            <td><code>RadioSelect</code></td>
+            <td><code>&lt;input type="radio"&gt;</code></td>
+            <td>ChoiceField (radio buttons)</td>
+          </tr>
+          <tr>
+            <td><code>CheckboxSelectMultiple</code></td>
+            <td><code>&lt;input type="checkbox"&gt;</code></td>
+            <td>Multiple checkboxes</td>
+          </tr>
+          <tr>
+            <td><code>FileInput</code></td>
+            <td><code>&lt;input type="file"&gt;</code></td>
+            <td>FileField</td>
+          </tr>
+          <tr>
+            <td><code>ClearableFileInput</code></td>
+            <td>File input with clear option</td>
+            <td>FileField with clear</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="choice-fields">Choice Fields</h3>
+      <p>Create dropdown menus, radio buttons, and checkbox groups:</p>
+
+<pre><code class="language-python">from django import forms
+
+class PreferencesForm(forms.Form):
+    # Basic choices as tuples (value, display_name)
+    PRIORITY_CHOICES = [
+        ('low', 'Low Priority'),
+        ('medium', 'Medium Priority'),
+        ('high', 'High Priority'),
+    ]
+
+    priority = forms.ChoiceField(
+        choices=PRIORITY_CHOICES,
+        initial='medium',
+    )
+
+    # Grouped choices
+    FOOD_CHOICES = [
+        ('Fruits', [
+            ('apple', 'Apple'),
+            ('banana', 'Banana'),
+            ('orange', 'Orange'),
+        ]),
+        ('Vegetables', [
+            ('carrot', 'Carrot'),
+            ('broccoli', 'Broccoli'),
+            ('spinach', 'Spinach'),
+        ]),
+    ]
+
+    favorite_food = forms.ChoiceField(choices=FOOD_CHOICES)
+
+    # Radio buttons instead of dropdown
+    SIZE_CHOICES = [
+        ('S', 'Small'),
+        ('M', 'Medium'),
+        ('L', 'Large'),
+        ('XL', 'Extra Large'),
+    ]
+
+    size = forms.ChoiceField(
+        choices=SIZE_CHOICES,
+        widget=forms.RadioSelect,
+    )
+
+    # Multiple choice (select multiple)
+    INTERESTS = [
+        ('tech', 'Technology'),
+        ('sports', 'Sports'),
+        ('music', 'Music'),
+        ('travel', 'Travel'),
+        ('food', 'Food'),
+    ]
+
+    interests = forms.MultipleChoiceField(
+        choices=INTERESTS,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+
+    # TypedChoiceField - coerces to specific type
+    RATING_CHOICES = [(i, str(i)) for i in range(1, 6)]
+
+    rating = forms.TypedChoiceField(
+        choices=RATING_CHOICES,
+        coerce=int,  # Convert to integer
+        empty_value=None,
+    )</code></pre>
+
+      <h3>Dynamic Choices</h3>
+      <p>Load choices from database in the form's <code>__init__</code>:</p>
+
+<pre><code class="language-python">from django import forms
+from .models import Category
+
+class ProductForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    category = forms.ChoiceField(choices=[])
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Load choices from database
+        self.fields['category'].choices = [
+            (cat.id, cat.name) for cat in Category.objects.all()
+        ]
+
+# Or use ModelChoiceField for foreign key relationships
+class ProductForm2(forms.Form):
+    name = forms.CharField(max_length=100)
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.all(),
+        empty_label="Select a category",
+        to_field_name='id',  # Value to use
+    )
+
+    # Multiple selection from model
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )</code></pre>
+
+      <h3 id="file-uploads">File Uploads</h3>
+      <p>Handle file and image uploads in forms:</p>
+
+<pre><code class="language-python">from django import forms
+from django.core.validators import FileExtensionValidator
+
+class UploadForm(forms.Form):
+    # Basic file upload
+    document = forms.FileField(
+        label='Upload Document',
+        help_text='Max file size: 5MB',
+    )
+
+    # Image upload with validation
+    photo = forms.ImageField(
+        label='Profile Photo',
+        required=False,
+        help_text='Upload a JPG or PNG image',
+    )
+
+    # File with extension validation
+    resume = forms.FileField(
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=['pdf', 'doc', 'docx']
+            )
+        ]
+    )
+
+    # Custom file validation
+    def clean_document(self):
+        document = self.cleaned_data.get('document')
+        if document:
+            # Check file size (5MB limit)
+            if document.size > 5 * 1024 * 1024:
+                raise forms.ValidationError('File too large. Max size is 5MB.')
+
+            # Check content type
+            allowed_types = ['application/pdf', 'text/plain']
+            if document.content_type not in allowed_types:
+                raise forms.ValidationError('Only PDF and TXT files allowed.')
+
+        return document</code></pre>
+
+      <h3>File Upload View</h3>
+      <p>Handle file uploads in views - note the <code>request.FILES</code>:</p>
+
+<pre><code class="language-python">from django.shortcuts import render, redirect
+from .forms import UploadForm
+
+def upload_file(request):
+    if request.method == 'POST':
+        # IMPORTANT: Include request.FILES for file uploads
+        form = UploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Access the uploaded file
+            uploaded_file = form.cleaned_data['document']
+
+            # Save to disk manually
+            with open(f'uploads/{uploaded_file.name}', 'wb+') as dest:
+                for chunk in uploaded_file.chunks():
+                    dest.write(chunk)
+
+            return redirect('upload_success')
+    else:
+        form = UploadForm()
+
+    return render(request, 'upload.html', {'form': form})</code></pre>
+
+      <h3>File Upload Template</h3>
+      <p>Use <code>enctype="multipart/form-data"</code> for file uploads:</p>
+
+<pre><code class="language-html">&lt;!-- IMPORTANT: enctype is required for file uploads --&gt;
+&lt;form method="post" enctype="multipart/form-data"&gt;
+    {% csrf_token %}
+    {{ form.as_p }}
+    &lt;button type="submit"&gt;Upload&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+
+      <div class="note">
+        <strong>File Upload Checklist:</strong>
+        <ul>
+          <li>Add <code>enctype="multipart/form-data"</code> to form tag</li>
+          <li>Pass <code>request.FILES</code> to form in view</li>
+          <li>Configure <code>MEDIA_ROOT</code> and <code>MEDIA_URL</code> in settings</li>
+          <li>Install Pillow for ImageField: <code>pip install Pillow</code></li>
+        </ul>
+      </div>
 
       <h3>Step 18: Create View to Handle Form</h3>
       <p>Add to <code>blog/views.py</code>:</p>
@@ -1176,6 +1688,303 @@ class ContactForm(forms.Form):
           <li><code>clean_&lt;fieldname&gt;()</code> - Custom field validation</li>
           <li><code>clean()</code> - Form-wide validation</li>
         </ol>
+      </div>
+
+      <h3>Built-in Validators</h3>
+      <p>Django provides many built-in validators you can use:</p>
+
+<pre><code class="language-python">from django import forms
+from django.core.validators import (
+    MinValueValidator, MaxValueValidator,
+    MinLengthValidator, MaxLengthValidator,
+    RegexValidator, EmailValidator, URLValidator,
+    validate_email, validate_slug, validate_unicode_slug,
+    validate_ipv4_address, validate_ipv6_address,
+    FileExtensionValidator,
+)
+
+class ValidatedForm(forms.Form):
+    # Number range validation
+    age = forms.IntegerField(
+        validators=[
+            MinValueValidator(0, message='Age cannot be negative.'),
+            MaxValueValidator(150, message='Age seems too high.'),
+        ]
+    )
+
+    # Text length validation
+    username = forms.CharField(
+        validators=[
+            MinLengthValidator(3),
+            MaxLengthValidator(20),
+        ]
+    )
+
+    # Regex validation
+    phone = forms.CharField(
+        validators=[
+            RegexValidator(
+                regex=r'^\+?1?\d{9,15}$',
+                message='Enter a valid phone number.',
+            )
+        ]
+    )
+
+    # Custom inline validator
+    code = forms.CharField(
+        validators=[
+            RegexValidator(
+                regex=r'^[A-Z]{3}-\d{4}$',
+                message='Code must be format: ABC-1234',
+            )
+        ]
+    )</code></pre>
+
+      <h3 id="error-handling">Error Handling</h3>
+      <p>Display form errors in templates:</p>
+
+<pre><code class="language-html">&lt;!-- Display all errors at once --&gt;
+{% if form.errors %}
+    &lt;div class="alert alert-danger"&gt;
+        &lt;strong&gt;Please correct the errors below:&lt;/strong&gt;
+        {{ form.errors }}
+    &lt;/div&gt;
+{% endif %}
+
+&lt;!-- Non-field errors (form-level validation) --&gt;
+{% if form.non_field_errors %}
+    &lt;div class="alert alert-danger"&gt;
+        {% for error in form.non_field_errors %}
+            &lt;p&gt;{{ error }}&lt;/p&gt;
+        {% endfor %}
+    &lt;/div&gt;
+{% endif %}
+
+&lt;!-- Individual field errors --&gt;
+&lt;form method="post"&gt;
+    {% csrf_token %}
+
+    &lt;div class="form-group {% if form.email.errors %}has-error{% endif %}"&gt;
+        &lt;label for="{{ form.email.id_for_label }}"&gt;
+            {{ form.email.label }}
+            {% if form.email.field.required %}&lt;span class="required"&gt;*&lt;/span&gt;{% endif %}
+        &lt;/label&gt;
+
+        {{ form.email }}
+
+        {% if form.email.errors %}
+            &lt;ul class="error-list"&gt;
+            {% for error in form.email.errors %}
+                &lt;li&gt;{{ error }}&lt;/li&gt;
+            {% endfor %}
+            &lt;/ul&gt;
+        {% endif %}
+
+        {% if form.email.help_text %}
+            &lt;small class="help-text"&gt;{{ form.email.help_text }}&lt;/small&gt;
+        {% endif %}
+    &lt;/div&gt;
+
+    &lt;button type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+
+      <h3>Adding Errors in Views</h3>
+      <p>Add custom errors programmatically:</p>
+
+<pre><code class="language-python">from django import forms
+
+def my_view(request):
+    if request.method == 'POST':
+        form = MyForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+
+            # Check if email already exists
+            if User.objects.filter(email=email).exists():
+                # Add error to specific field
+                form.add_error('email', 'This email is already registered.')
+
+            # Add non-field error
+            if some_condition:
+                form.add_error(None, 'Something went wrong. Please try again.')
+
+            # If errors were added, form is no longer valid
+            if not form.errors:
+                # Process form...
+                pass
+
+    return render(request, 'form.html', {'form': form})</code></pre>
+
+      <h3>Looping Through Form Fields</h3>
+      <p>Render all fields dynamically:</p>
+
+<pre><code class="language-html">&lt;form method="post"&gt;
+    {% csrf_token %}
+
+    {% for field in form %}
+        &lt;div class="form-group {% if field.errors %}has-error{% endif %}"&gt;
+            &lt;label for="{{ field.id_for_label }}"&gt;
+                {{ field.label }}
+            &lt;/label&gt;
+
+            {{ field }}
+
+            {% for error in field.errors %}
+                &lt;span class="error"&gt;{{ error }}&lt;/span&gt;
+            {% endfor %}
+        &lt;/div&gt;
+    {% endfor %}
+
+    &lt;!-- Hidden fields --&gt;
+    {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+
+    &lt;button type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+
+      <h3 id="formsets">Formsets</h3>
+      <p>
+        Formsets allow you to work with multiple forms on a single page.
+        Use them when you need to create or edit multiple objects at once.
+      </p>
+
+<pre><code class="language-python">from django import forms
+from django.forms import formset_factory
+
+# Define a simple form
+class BookForm(forms.Form):
+    title = forms.CharField(max_length=100)
+    author = forms.CharField(max_length=50)
+
+# Create a formset from the form
+BookFormSet = formset_factory(
+    BookForm,
+    extra=3,           # Number of empty forms to display
+    max_num=10,        # Maximum number of forms
+    min_num=1,         # Minimum number of forms
+    validate_max=True, # Validate max_num
+    validate_min=True, # Validate min_num
+)</code></pre>
+
+      <h3>Using Formsets in Views</h3>
+
+<pre><code class="language-python">from django.shortcuts import render, redirect
+from .forms import BookFormSet
+
+def manage_books(request):
+    if request.method == 'POST':
+        formset = BookFormSet(request.POST)
+        if formset.is_valid():
+            for form in formset:
+                if form.cleaned_data:  # Skip empty forms
+                    title = form.cleaned_data['title']
+                    author = form.cleaned_data['author']
+                    # Save each book
+                    Book.objects.create(title=title, author=author)
+            return redirect('book_list')
+    else:
+        formset = BookFormSet()
+
+    return render(request, 'manage_books.html', {'formset': formset})</code></pre>
+
+      <h3>Formset Template</h3>
+
+<pre><code class="language-html">&lt;form method="post"&gt;
+    {% csrf_token %}
+
+    &lt;!-- Management form (required for formsets) --&gt;
+    {{ formset.management_form }}
+
+    &lt;table&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th&gt;Title&lt;/th&gt;
+                &lt;th&gt;Author&lt;/th&gt;
+            &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+            {% for form in formset %}
+                &lt;tr&gt;
+                    &lt;td&gt;{{ form.title }}&lt;/td&gt;
+                    &lt;td&gt;{{ form.author }}&lt;/td&gt;
+                &lt;/tr&gt;
+                {% if form.errors %}
+                    &lt;tr&gt;
+                        &lt;td colspan="2"&gt;{{ form.errors }}&lt;/td&gt;
+                    &lt;/tr&gt;
+                {% endif %}
+            {% endfor %}
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+
+    &lt;button type="submit"&gt;Save All Books&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+
+      <h3>ModelFormSet</h3>
+      <p>Create formsets directly from models:</p>
+
+<pre><code class="language-python">from django.forms import modelformset_factory
+from .models import Book
+
+# Create a formset from a model
+BookFormSet = modelformset_factory(
+    Book,
+    fields=['title', 'author'],
+    extra=2,
+    can_delete=True,  # Allow deleting objects
+)
+
+def manage_books(request):
+    if request.method == 'POST':
+        formset = BookFormSet(request.POST)
+        if formset.is_valid():
+            formset.save()  # Saves all forms automatically
+            return redirect('book_list')
+    else:
+        formset = BookFormSet(queryset=Book.objects.all())
+
+    return render(request, 'manage_books.html', {'formset': formset})</code></pre>
+
+      <h3>Inline Formsets</h3>
+      <p>Edit related objects together with parent object:</p>
+
+<pre><code class="language-python">from django.forms import inlineformset_factory
+from .models import Author, Book
+
+# Create inline formset for books belonging to an author
+BookInlineFormSet = inlineformset_factory(
+    Author,               # Parent model
+    Book,                 # Child model
+    fields=['title'],     # Fields to include
+    extra=2,              # Number of extra blank forms
+    can_delete=True,      # Allow deleting books
+)
+
+def edit_author(request, author_id):
+    author = Author.objects.get(pk=author_id)
+
+    if request.method == 'POST':
+        formset = BookInlineFormSet(request.POST, instance=author)
+        if formset.is_valid():
+            formset.save()
+            return redirect('author_detail', pk=author.pk)
+    else:
+        formset = BookInlineFormSet(instance=author)
+
+    return render(request, 'edit_author.html', {
+        'author': author,
+        'formset': formset,
+    })</code></pre>
+
+      <div class="note">
+        <strong>Formset Tips:</strong>
+        <ul>
+          <li>Always include <code>{{ formset.management_form }}</code> in templates</li>
+          <li>Check <code>form.cleaned_data</code> before processing to skip empty forms</li>
+          <li>Use <code>can_delete=True</code> to allow removal of objects</li>
+          <li>For dynamic forms (add/remove via JavaScript), update management form values</li>
+        </ul>
       </div>
 
       <h3 id="modelforms">ModelForms</h3>
