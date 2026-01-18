@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Django Tutorial: Complete Guide | INSHA-AI</title>
+  <meta name="description" content="A comprehensive Django tutorial covering installation, project structure, models, views, templates, admin interface, and more." />
+  <link rel="stylesheet" href="../../styles.css" />
+  <!-- Highlight.js for syntax highlighting -->
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      const hljsTheme = document.getElementById('hljs-theme');
+      if (theme === 'light') {
+        hljsTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+      }
+    })();
+  </script>
+  <style>
+    /* Layout */
+    .page-wrapper {
+      display: flex;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      gap: 3rem;
+    }
+    #content {
+      flex: 1;
+      max-width: 800px;
+      min-width: 0;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      flex-shrink: 0;
+    }
+    .sidebar-nav {
+      position: sticky;
+      top: 2rem;
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
+    }
+    .sidebar-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+    .sidebar-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sidebar-nav li {
+      margin: 0;
+    }
+    .sidebar-nav a {
+      display: block;
+      padding: 0.4rem 0;
+      padding-left: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      border-left: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .sidebar-nav a:hover {
+      color: var(--text);
+    }
+    .sidebar-nav a.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+    }
+    .sidebar-nav .sub-item a {
+      padding-left: 1.5rem;
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 1024px) {
+      .sidebar { display: none; }
+      .page-wrapper { max-width: 800px; }
+    }
+
+    /* Content styles */
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: var(--accent); }
+    .back-link:hover { text-decoration: underline; }
+    h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: 1rem; color: var(--accent); scroll-margin-top: 2rem; }
+    h3 { font-size: 1.2rem; margin-top: 2rem; margin-bottom: 0.75rem; scroll-margin-top: 2rem; }
+    p { margin-bottom: 1rem; }
+    .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+    ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+    li { margin-bottom: 0.5rem; }
+    .note {
+      background: rgba(88, 166, 255, 0.1);
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0 8px 8px 0;
+    }
+    .note strong { color: var(--accent); }
+    .code-block {
+      position: relative;
+    }
+    pre {
+      background: var(--bg-secondary);
+      padding: 1rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+    }
+    pre code.hljs {
+      background: transparent;
+      padding: 0;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s, background 0.2s;
+    }
+    .code-block:hover .copy-btn {
+      opacity: 1;
+    }
+    .copy-btn:hover {
+      background: var(--border);
+      color: var(--text);
+    }
+    .copy-btn.copied {
+      color: #3fb950;
+    }
+    code {
+      background: rgba(88, 166, 255, 0.15);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre code { background: none; padding: 0; }
+    .footer-post {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      font-weight: 600;
+      border-bottom: 2px solid var(--border);
+    }
+    .file-tree {
+      background: var(--bg-secondary);
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      font-family: ui-monospace, monospace;
+      font-size: 0.9em;
+      border: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+<!-- Header with theme toggle -->
+<header class="topbar">
+  <div class="container topbar__inner">
+    <a class="brand" href="../../">INSHA-AI</a>
+    <div style="flex: 1;"></div>
+    <button id="themeToggle" class="btn theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+      <span class="theme-icon"></span>
+    </button>
+  </div>
+</header>
+
+<div class="page-wrapper">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <nav class="sidebar-nav">
+      <div class="sidebar-title">On this page</div>
+      <ul>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#installation">Installation and Setup</a></li>
+        <li class="sub-item"><a href="#virtual-env">Virtual Environment</a></li>
+        <li class="sub-item"><a href="#install-django">Install Django</a></li>
+        <li><a href="#project-structure">Project Structure</a></li>
+        <li><a href="#applications">Applications</a></li>
+        <li><a href="#models">Models</a></li>
+        <li class="sub-item"><a href="#field-types">Field Types</a></li>
+        <li class="sub-item"><a href="#migrations">Migrations</a></li>
+        <li><a href="#views">Views</a></li>
+        <li class="sub-item"><a href="#queryset">QuerySet Methods</a></li>
+        <li><a href="#urls">URL Routing</a></li>
+        <li><a href="#templates">Templates</a></li>
+        <li class="sub-item"><a href="#template-tags">Template Tags</a></li>
+        <li><a href="#admin">Admin Interface</a></li>
+        <li><a href="#running">Running the Server</a></li>
+        <li><a href="#reference">Quick Reference</a></li>
+        <li><a href="#next-steps">Next Steps</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div id="content" class="content">
+    <a href="../../" class="back-link">&larr; Back to all posts</a>
+
+    <article>
+      <h1>Django Tutorial: Complete Guide</h1>
+      <p class="meta">Web Development, Python, Django</p>
+
+      <h2 id="introduction">Introduction</h2>
+      <p>
+        Django is a high-level Python web framework that encourages rapid development and clean, pragmatic design.
+        It follows the <strong>MTV (Model-Template-View)</strong> architectural pattern, which is similar to MVC
+        but with Django-specific terminology.
+      </p>
+
+      <h3>Prerequisites</h3>
+      <ul>
+        <li>Python 3.8 or higher</li>
+        <li>pip (Python package manager)</li>
+        <li>Basic knowledge of Python</li>
+        <li>Command line familiarity</li>
+      </ul>
+
+      <h2 id="installation">Installation and Setup</h2>
+
+      <h3 id="virtual-env">Step 1: Create Virtual Environment</h3>
+      <p>A virtual environment isolates project dependencies from the system Python.</p>
+
+<pre><code class="language-bash"># Create virtual environment
+python -m venv venv
+
+# Activate on Linux/macOS
+source venv/bin/activate
+
+# Activate on Windows
+venv\Scripts\activate</code></pre>
+
+      <div class="note">
+        <strong>Why Virtual Environments?</strong>
+        <ul>
+          <li>Isolates project dependencies</li>
+          <li>Prevents version conflicts between projects</li>
+          <li>Makes deployment reproducible</li>
+          <li>Keeps system Python clean</li>
+        </ul>
+      </div>
+
+      <h3 id="install-django">Step 2: Install Django</h3>
+
+<pre><code class="language-bash">pip install django</code></pre>
+
+      <p>Verify installation:</p>
+
+<pre><code class="language-bash">python -m django --version</code></pre>
+
+      <h2 id="project-structure">Project Structure</h2>
+
+      <h3>Step 3: Create a Django Project</h3>
+
+<pre><code class="language-bash">django-admin startproject myproject
+cd myproject</code></pre>
+
+      <h3>Project Directory Structure</h3>
+
+      <div class="file-tree">
+myproject/<br>
+├── manage.py              # Command-line utility for administrative tasks<br>
+└── myproject/<br>
+    ├── __init__.py        # Makes this directory a Python package<br>
+    ├── settings.py        # Project configuration<br>
+    ├── urls.py            # URL declarations (routing)<br>
+    ├── asgi.py            # ASGI entry point for async servers<br>
+    └── wsgi.py            # WSGI entry point for web servers
+      </div>
+
+      <h3>Key Files Explained</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>File</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>manage.py</code></td>
+            <td>Run commands like runserver, migrate, createsuperuser</td>
+          </tr>
+          <tr>
+            <td><code>settings.py</code></td>
+            <td>Database config, installed apps, middleware, etc.</td>
+          </tr>
+          <tr>
+            <td><code>urls.py</code></td>
+            <td>Maps URL patterns to views</td>
+          </tr>
+          <tr>
+            <td><code>wsgi.py</code></td>
+            <td>Web Server Gateway Interface for deployment</td>
+          </tr>
+          <tr>
+            <td><code>asgi.py</code></td>
+            <td>Async Server Gateway Interface for async support</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="applications">Applications</h2>
+
+      <h3>Step 4: Create a Django App</h3>
+      <p>Apps are modular components that handle specific functionality.</p>
+
+<pre><code class="language-bash">python manage.py startapp blog</code></pre>
+
+      <h3>App Directory Structure</h3>
+
+      <div class="file-tree">
+blog/<br>
+├── __init__.py        # Python package marker<br>
+├── admin.py           # Admin panel configuration<br>
+├── apps.py            # App configuration<br>
+├── models.py          # Database models<br>
+├── tests.py           # Unit tests<br>
+├── views.py           # View functions/classes<br>
+└── migrations/        # Database migration files<br>
+    └── __init__.py
+      </div>
+
+      <h3>Step 5: Register the App</h3>
+      <p>Edit <code>myproject/settings.py</code>:</p>
+
+<pre><code class="language-python">INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'blog',  # Add your app here
+]</code></pre>
+
+      <div class="note">
+        <strong>Why Register Apps?</strong><br>
+        Django needs to know about your app to:
+        <ul>
+          <li>Include it in migrations</li>
+          <li>Find templates and static files</li>
+          <li>Register models with admin</li>
+          <li>Load app configurations</li>
+        </ul>
+      </div>
+
+      <h2 id="models">Models (Database Layer)</h2>
+
+      <h3>Step 6: Define Models</h3>
+      <p>Models define database table structure using Python classes. Edit <code>blog/models.py</code>:</p>
+
+<pre><code class="language-python">from django.db import models
+
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    published = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title</code></pre>
+
+      <h3 id="field-types">Field Types Reference</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Field Type</th>
+            <th>Description</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>CharField</code></td>
+            <td>Short text (requires max_length)</td>
+            <td><code>models.CharField(max_length=100)</code></td>
+          </tr>
+          <tr>
+            <td><code>TextField</code></td>
+            <td>Long text</td>
+            <td><code>models.TextField()</code></td>
+          </tr>
+          <tr>
+            <td><code>IntegerField</code></td>
+            <td>Integer numbers</td>
+            <td><code>models.IntegerField()</code></td>
+          </tr>
+          <tr>
+            <td><code>FloatField</code></td>
+            <td>Floating point numbers</td>
+            <td><code>models.FloatField()</code></td>
+          </tr>
+          <tr>
+            <td><code>BooleanField</code></td>
+            <td>True/False values</td>
+            <td><code>models.BooleanField(default=False)</code></td>
+          </tr>
+          <tr>
+            <td><code>DateTimeField</code></td>
+            <td>Date and time</td>
+            <td><code>models.DateTimeField(auto_now_add=True)</code></td>
+          </tr>
+          <tr>
+            <td><code>DateField</code></td>
+            <td>Date only</td>
+            <td><code>models.DateField()</code></td>
+          </tr>
+          <tr>
+            <td><code>EmailField</code></td>
+            <td>Email validation</td>
+            <td><code>models.EmailField()</code></td>
+          </tr>
+          <tr>
+            <td><code>URLField</code></td>
+            <td>URL validation</td>
+            <td><code>models.URLField()</code></td>
+          </tr>
+          <tr>
+            <td><code>ForeignKey</code></td>
+            <td>Many-to-one relationship</td>
+            <td><code>models.ForeignKey(User, on_delete=models.CASCADE)</code></td>
+          </tr>
+          <tr>
+            <td><code>ManyToManyField</code></td>
+            <td>Many-to-many relationship</td>
+            <td><code>models.ManyToManyField(Tag)</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Common Field Options</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>max_length</code></td>
+            <td>Maximum character length (required for CharField)</td>
+          </tr>
+          <tr>
+            <td><code>default</code></td>
+            <td>Default value for the field</td>
+          </tr>
+          <tr>
+            <td><code>null</code></td>
+            <td>Allow NULL in database (default: False)</td>
+          </tr>
+          <tr>
+            <td><code>blank</code></td>
+            <td>Allow empty in forms (default: False)</td>
+          </tr>
+          <tr>
+            <td><code>choices</code></td>
+            <td>Limit to predefined choices</td>
+          </tr>
+          <tr>
+            <td><code>unique</code></td>
+            <td>Enforce uniqueness</td>
+          </tr>
+          <tr>
+            <td><code>auto_now_add</code></td>
+            <td>Set to current datetime on creation</td>
+          </tr>
+          <tr>
+            <td><code>auto_now</code></td>
+            <td>Update to current datetime on every save</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="migrations">Step 7: Create and Apply Migrations</h3>
+      <p>Migrations translate model changes into database schema changes.</p>
+
+<pre><code class="language-bash"># Create migration files
+python manage.py makemigrations
+
+# Apply migrations to database
+python manage.py migrate</code></pre>
+
+      <h3>Migration Commands</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Command</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>makemigrations</code></td>
+            <td>Create new migration files</td>
+          </tr>
+          <tr>
+            <td><code>migrate</code></td>
+            <td>Apply pending migrations</td>
+          </tr>
+          <tr>
+            <td><code>showmigrations</code></td>
+            <td>List all migrations and status</td>
+          </tr>
+          <tr>
+            <td><code>sqlmigrate app_name 0001</code></td>
+            <td>Show SQL for a migration</td>
+          </tr>
+          <tr>
+            <td><code>migrate app_name zero</code></td>
+            <td>Unapply all migrations for an app</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="views">Views (Business Logic)</h2>
+
+      <h3>Step 8: Create Views</h3>
+      <p>Views handle requests and return responses. Edit <code>blog/views.py</code>:</p>
+
+<pre><code class="language-python">from django.shortcuts import render, get_object_or_404
+from .models import Post
+
+def post_list(request):
+    """Display all published posts."""
+    posts = Post.objects.filter(published=True)
+    return render(request, 'blog/post_list.html', {'posts': posts})
+
+def post_detail(request, pk):
+    """Display a single post."""
+    post = get_object_or_404(Post, pk=pk)
+    return render(request, 'blog/post_detail.html', {'post': post})</code></pre>
+
+      <h3>View Components Explained</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>request</code></td>
+            <td>HTTP request object with user data, method</td>
+          </tr>
+          <tr>
+            <td><code>render()</code></td>
+            <td>Combines template with context data</td>
+          </tr>
+          <tr>
+            <td><code>get_object_or_404()</code></td>
+            <td>Fetch object or return 404 error</td>
+          </tr>
+          <tr>
+            <td><code>Post.objects</code></td>
+            <td>Model manager for database queries</td>
+          </tr>
+          <tr>
+            <td><code>filter()</code></td>
+            <td>Query with conditions</td>
+          </tr>
+          <tr>
+            <td>Context dictionary</td>
+            <td>Data passed to template</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="queryset">Common QuerySet Methods</h3>
+
+<pre><code class="language-python"># Get all objects
+Post.objects.all()
+
+# Filter with conditions
+Post.objects.filter(published=True)
+
+# Exclude records
+Post.objects.exclude(published=False)
+
+# Get single object (raises exception if not found)
+Post.objects.get(pk=1)
+
+# Order results
+Post.objects.order_by('-created_at')  # Descending
+Post.objects.order_by('title')        # Ascending
+
+# Limit results
+Post.objects.all()[:5]  # First 5
+
+# Count records
+Post.objects.count()
+
+# Check existence
+Post.objects.filter(title='Hello').exists()</code></pre>
+
+      <h2 id="urls">URL Routing</h2>
+
+      <h3>Step 9: Create App URLs</h3>
+      <p>Create <code>blog/urls.py</code>:</p>
+
+<pre><code class="language-python">from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.post_list, name='post_list'),
+    path('post/&lt;int:pk&gt;/', views.post_detail, name='post_detail'),
+]</code></pre>
+
+      <h3>URL Pattern Syntax</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Pattern</th>
+            <th>Description</th>
+            <th>Example Match</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>''</code></td>
+            <td>Empty path (root)</td>
+            <td><code>/</code></td>
+          </tr>
+          <tr>
+            <td><code>'posts/'</code></td>
+            <td>Literal string</td>
+            <td><code>/posts/</code></td>
+          </tr>
+          <tr>
+            <td><code>'&lt;int:pk&gt;/'</code></td>
+            <td>Integer parameter</td>
+            <td><code>/5/</code></td>
+          </tr>
+          <tr>
+            <td><code>'&lt;str:slug&gt;/'</code></td>
+            <td>String parameter</td>
+            <td><code>/hello-world/</code></td>
+          </tr>
+          <tr>
+            <td><code>'&lt;slug:slug&gt;/'</code></td>
+            <td>Slug (letters, numbers, hyphens)</td>
+            <td><code>/my-post-123/</code></td>
+          </tr>
+          <tr>
+            <td><code>'&lt;uuid:id&gt;/'</code></td>
+            <td>UUID parameter</td>
+            <td><code>/550e8400-e29b.../</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Step 10: Include App URLs in Project</h3>
+      <p>Edit <code>myproject/urls.py</code>:</p>
+
+<pre><code class="language-python">from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('blog.urls')),  # Include app URLs
+]</code></pre>
+
+      <div class="note">
+        <strong>Why Use include()?</strong>
+        <ul>
+          <li>Keeps URLs modular and organized</li>
+          <li>Each app manages its own URLs</li>
+          <li>Makes apps reusable across projects</li>
+          <li>Easier to maintain large projects</li>
+        </ul>
+      </div>
+
+      <h2 id="templates">Templates (Presentation Layer)</h2>
+
+      <h3>Step 11: Create Template Directory</h3>
+
+<pre><code class="language-bash">mkdir -p blog/templates/blog</code></pre>
+
+      <h3>Template Directory Structure</h3>
+
+      <div class="file-tree">
+blog/<br>
+└── templates/<br>
+    └── blog/              # Namespaced to avoid conflicts<br>
+        ├── base.html      # Base template (optional)<br>
+        ├── post_list.html<br>
+        └── post_detail.html
+      </div>
+
+      <h3>Step 12: Create Post List Template</h3>
+      <p>Create <code>blog/templates/blog/post_list.html</code>:</p>
+
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Blog&lt;/title&gt;
+    &lt;style&gt;
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        article { border-bottom: 1px solid #ddd; padding: 20px 0; }
+        h2 a { color: #333; text-decoration: none; }
+        h2 a:hover { color: #007bff; }
+        small { color: #666; }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;My Blog&lt;/h1&gt;
+
+    {% for post in posts %}
+        &lt;article&gt;
+            &lt;h2&gt;&lt;a href="{% url 'post_detail' pk=post.pk %}"&gt;{{ post.title }}&lt;/a&gt;&lt;/h2&gt;
+            &lt;p&gt;{{ post.content|truncatewords:30 }}&lt;/p&gt;
+            &lt;small&gt;Published: {{ post.created_at|date:"F d, Y" }}&lt;/small&gt;
+        &lt;/article&gt;
+    {% empty %}
+        &lt;p&gt;No posts available yet.&lt;/p&gt;
+    {% endfor %}
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+      <h3>Step 13: Create Post Detail Template</h3>
+      <p>Create <code>blog/templates/blog/post_detail.html</code>:</p>
+
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;{{ post.title }}&lt;/title&gt;
+    &lt;style&gt;
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .meta { color: #666; margin-bottom: 20px; }
+        .back-link { display: inline-block; margin-top: 20px; color: #007bff; }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;article&gt;
+        &lt;h1&gt;{{ post.title }}&lt;/h1&gt;
+        &lt;p class="meta"&gt;Published: {{ post.created_at|date:"F d, Y H:i" }}&lt;/p&gt;
+        &lt;div class="content"&gt;
+            {{ post.content|linebreaks }}
+        &lt;/div&gt;
+    &lt;/article&gt;
+
+    &lt;a href="{% url 'post_list' %}" class="back-link"&gt;&amp;larr; Back to all posts&lt;/a&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+      <h3 id="template-tags">Template Tags and Filters</h3>
+
+      <h4>Common Template Tags</h4>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Tag</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>{% for item in list %}</code></td>
+            <td>Loop through items</td>
+          </tr>
+          <tr>
+            <td><code>{% if condition %}</code></td>
+            <td>Conditional rendering</td>
+          </tr>
+          <tr>
+            <td><code>{% url 'name' %}</code></td>
+            <td>Generate URL by name</td>
+          </tr>
+          <tr>
+            <td><code>{% include 'file.html' %}</code></td>
+            <td>Include another template</td>
+          </tr>
+          <tr>
+            <td><code>{% extends 'base.html' %}</code></td>
+            <td>Inherit from base template</td>
+          </tr>
+          <tr>
+            <td><code>{% block name %}</code></td>
+            <td>Define overridable block</td>
+          </tr>
+          <tr>
+            <td><code>{% csrf_token %}</code></td>
+            <td>CSRF protection for forms</td>
+          </tr>
+          <tr>
+            <td><code>{% load static %}</code></td>
+            <td>Load static files tag library</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Common Template Filters</h4>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Filter</th>
+            <th>Purpose</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>truncatewords:N</code></td>
+            <td>Limit to N words</td>
+            <td><code>{{ text|truncatewords:30 }}</code></td>
+          </tr>
+          <tr>
+            <td><code>date:"format"</code></td>
+            <td>Format date</td>
+            <td><code>{{ date|date:"F d, Y" }}</code></td>
+          </tr>
+          <tr>
+            <td><code>linebreaks</code></td>
+            <td>Convert newlines to &lt;p&gt; and &lt;br&gt;</td>
+            <td><code>{{ text|linebreaks }}</code></td>
+          </tr>
+          <tr>
+            <td><code>safe</code></td>
+            <td>Mark as safe HTML</td>
+            <td><code>{{ html|safe }}</code></td>
+          </tr>
+          <tr>
+            <td><code>default:"value"</code></td>
+            <td>Default if empty</td>
+            <td><code>{{ var|default:"N/A" }}</code></td>
+          </tr>
+          <tr>
+            <td><code>length</code></td>
+            <td>Get length</td>
+            <td><code>{{ list|length }}</code></td>
+          </tr>
+          <tr>
+            <td><code>lower / upper</code></td>
+            <td>Change case</td>
+            <td><code>{{ text|upper }}</code></td>
+          </tr>
+          <tr>
+            <td><code>slugify</code></td>
+            <td>Convert to slug</td>
+            <td><code>{{ title|slugify }}</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="admin">Admin Interface</h2>
+
+      <h3>Step 14: Register Models with Admin</h3>
+      <p>Edit <code>blog/admin.py</code>:</p>
+
+<pre><code class="language-python">from django.contrib import admin
+from .models import Post
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    list_display = ['title', 'created_at', 'published']
+    list_filter = ['published', 'created_at']
+    search_fields = ['title', 'content']
+    list_editable = ['published']
+    ordering = ['-created_at']</code></pre>
+
+      <h3>Admin Options Reference</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>list_display</code></td>
+            <td>Fields to show in list view</td>
+          </tr>
+          <tr>
+            <td><code>list_filter</code></td>
+            <td>Add filter sidebar</td>
+          </tr>
+          <tr>
+            <td><code>search_fields</code></td>
+            <td>Enable search on these fields</td>
+          </tr>
+          <tr>
+            <td><code>list_editable</code></td>
+            <td>Allow editing in list view</td>
+          </tr>
+          <tr>
+            <td><code>ordering</code></td>
+            <td>Default sort order</td>
+          </tr>
+          <tr>
+            <td><code>readonly_fields</code></td>
+            <td>Fields that cannot be edited</td>
+          </tr>
+          <tr>
+            <td><code>prepopulated_fields</code></td>
+            <td>Auto-fill fields (e.g., slug from title)</td>
+          </tr>
+          <tr>
+            <td><code>date_hierarchy</code></td>
+            <td>Add date-based navigation</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Step 15: Create Superuser</h3>
+
+<pre><code class="language-bash">python manage.py createsuperuser</code></pre>
+
+      <p>Follow the prompts to set:</p>
+      <ul>
+        <li>Username</li>
+        <li>Email (optional)</li>
+        <li>Password</li>
+      </ul>
+
+      <h2 id="running">Running the Server</h2>
+
+      <h3>Step 16: Start Development Server</h3>
+
+<pre><code class="language-bash">python manage.py runserver</code></pre>
+
+      <h3>Available URLs</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>URL</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>http://127.0.0.1:8000/</code></td>
+            <td>Blog post list</td>
+          </tr>
+          <tr>
+            <td><code>http://127.0.0.1:8000/post/1/</code></td>
+            <td>Individual post (pk=1)</td>
+          </tr>
+          <tr>
+            <td><code>http://127.0.0.1:8000/admin/</code></td>
+            <td>Admin interface</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Runserver Options</h3>
+
+<pre><code class="language-bash"># Run on different port
+python manage.py runserver 8080
+
+# Run on all interfaces (for network access)
+python manage.py runserver 0.0.0.0:8000</code></pre>
+
+      <h2 id="reference">Quick Reference</h2>
+
+      <h3>Essential manage.py Commands</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Command</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>runserver</code></td>
+            <td>Start development server</td>
+          </tr>
+          <tr>
+            <td><code>startapp app_name</code></td>
+            <td>Create new app</td>
+          </tr>
+          <tr>
+            <td><code>makemigrations</code></td>
+            <td>Create migration files</td>
+          </tr>
+          <tr>
+            <td><code>migrate</code></td>
+            <td>Apply migrations</td>
+          </tr>
+          <tr>
+            <td><code>createsuperuser</code></td>
+            <td>Create admin user</td>
+          </tr>
+          <tr>
+            <td><code>shell</code></td>
+            <td>Interactive Python shell with Django</td>
+          </tr>
+          <tr>
+            <td><code>dbshell</code></td>
+            <td>Database command line</td>
+          </tr>
+          <tr>
+            <td><code>collectstatic</code></td>
+            <td>Gather static files for deployment</td>
+          </tr>
+          <tr>
+            <td><code>test</code></td>
+            <td>Run tests</td>
+          </tr>
+          <tr>
+            <td><code>check</code></td>
+            <td>Check for project issues</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Django Project Checklist</h3>
+      <ul>
+        <li>Create virtual environment</li>
+        <li>Install Django</li>
+        <li>Create project with <code>django-admin startproject</code></li>
+        <li>Create app with <code>python manage.py startapp</code></li>
+        <li>Add app to <code>INSTALLED_APPS</code></li>
+        <li>Define models in <code>models.py</code></li>
+        <li>Run <code>makemigrations</code> and <code>migrate</code></li>
+        <li>Create views in <code>views.py</code></li>
+        <li>Create <code>urls.py</code> in app</li>
+        <li>Include app URLs in project <code>urls.py</code></li>
+        <li>Create templates directory</li>
+        <li>Create HTML templates</li>
+        <li>Register models in <code>admin.py</code></li>
+        <li>Create superuser</li>
+        <li>Run server and test</li>
+      </ul>
+
+      <h2 id="next-steps">Next Steps</h2>
+
+      <h3>Topics to Explore</h3>
+      <ol>
+        <li><strong>Forms:</strong> User input handling with <code>django.forms</code></li>
+        <li><strong>Authentication:</strong> Login, logout, registration with <code>django.contrib.auth</code></li>
+        <li><strong>Static Files:</strong> CSS, JavaScript, images</li>
+        <li><strong>Class-Based Views:</strong> Reusable view patterns</li>
+        <li><strong>REST APIs:</strong> Django REST Framework</li>
+        <li><strong>Testing:</strong> Unit and integration tests</li>
+        <li><strong>Deployment:</strong> Gunicorn, Nginx, Docker</li>
+      </ol>
+
+      <h3>Useful Resources</h3>
+      <ul>
+        <li>Official Documentation: <a href="https://docs.djangoproject.com/">https://docs.djangoproject.com/</a></li>
+        <li>Django Girls Tutorial: <a href="https://tutorial.djangogirls.org/">https://tutorial.djangogirls.org/</a></li>
+        <li>Two Scoops of Django (Book)</li>
+        <li>Django REST Framework: <a href="https://www.django-rest-framework.org/">https://www.django-rest-framework.org/</a></li>
+      </ul>
+
+      <div class="footer-post">
+        <p>
+          Found this helpful? Check out more posts on <a href="../../">the blog</a>.
+        </p>
+      </div>
+    </article>
+  </div>
+</div>
+
+<script>
+  // Apply theme
+  const theme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+
+  // Theme toggle
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon = themeToggle.querySelector('.theme-icon');
+  themeIcon.textContent = theme === 'dark' ? '' : '';
+
+  themeToggle.addEventListener('click', function() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    themeIcon.textContent = newTheme === 'dark' ? '' : '';
+
+    // Update highlight.js theme
+    const hljsTheme = document.getElementById('hljs-theme');
+    if (newTheme === 'light') {
+      hljsTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+    } else {
+      hljsTheme.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css';
+    }
+  });
+
+  // Syntax highlighting
+  hljs.highlightAll();
+
+  // Copy buttons
+  document.querySelectorAll('pre').forEach(function(pre) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block';
+    pre.parentNode.insertBefore(wrapper, pre);
+    wrapper.appendChild(pre);
+
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', function() {
+      const code = pre.querySelector('code');
+      const text = code ? code.textContent : pre.textContent;
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+    wrapper.appendChild(btn);
+  });
+
+  // Sidebar active state
+  const sections = document.querySelectorAll('h2[id], h3[id]');
+  const navLinks = document.querySelectorAll('.sidebar-nav a');
+
+  function updateActiveLink() {
+    let currentSection = '';
+    sections.forEach(function(section) {
+      const sectionTop = section.offsetTop;
+      if (window.scrollY >= sectionTop - 100) {
+        currentSection = section.getAttribute('id');
+      }
+    });
+    navLinks.forEach(function(link) {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + currentSection) {
+        link.classList.add('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveLink);
+  updateActiveLink();
+</script>
+</body>
+</html>

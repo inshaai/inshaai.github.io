@@ -1,5 +1,14 @@
 [
   {
+    "id": "django-tutorial",
+    "title": "Django Tutorial: Complete Guide",
+    "date": "2026-01-18",
+    "tags": ["web-development", "python", "django"],
+    "excerpt": "Comprehensive Django tutorial covering installation, project structure, models, views, templates, admin interface, and more.",
+    "url": "./posts/2026-01-18-django-tutorial/",
+    "readingTime": 30
+  },
+  {
     "id": "support-vector-machines",
     "title": "Support Vector Machines From Scratch",
     "date": "2026-01-17",

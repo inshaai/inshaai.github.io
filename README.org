@@ -1,0 +1,548 @@
+#+TITLE: Django Tutorial
+#+AUTHOR: Django Learning Guide
+#+OPTIONS: toc:3 num:t
+
+* Introduction
+
+Django is a high-level Python web framework that encourages rapid development and clean, pragmatic design. It follows the MTV (Model-Template-View) architectural pattern.
+
+** Prerequisites
+
+- Python 3.8 or higher
+- pip (Python package manager)
+- Basic knowledge of Python
+- Command line familiarity
+
+* Installation and Setup
+
+** Step 1: Create Virtual Environment
+
+A virtual environment isolates project dependencies from the system Python.
+
+#+BEGIN_SRC bash
+# Create virtual environment
+python -m venv venv
+
+# Activate on Linux/macOS
+source venv/bin/activate
+
+# Activate on Windows
+venv\Scripts\activate
+#+END_SRC
+
+*** Why Virtual Environments?
+
+- Isolates project dependencies
+- Prevents version conflicts between projects
+- Makes deployment reproducible
+- Keeps system Python clean
+
+** Step 2: Install Django
+
+#+BEGIN_SRC bash
+pip install django
+#+END_SRC
+
+Verify installation:
+
+#+BEGIN_SRC bash
+python -m django --version
+#+END_SRC
+
+* Project Structure
+
+** Step 3: Create a Django Project
+
+#+BEGIN_SRC bash
+django-admin startproject myproject
+cd myproject
+#+END_SRC
+
+*** Project Directory Structure
+
+#+BEGIN_EXAMPLE
+myproject/
+├── manage.py              # Command-line utility for administrative tasks
+└── myproject/
+    ├── __init__.py        # Makes this directory a Python package
+    ├── settings.py        # Project configuration
+    ├── urls.py            # URL declarations (routing)
+    ├── asgi.py            # ASGI entry point for async servers
+    └── wsgi.py            # WSGI entry point for web servers
+#+END_EXAMPLE
+
+*** Key Files Explained
+
+| File         | Purpose                                              |
+|--------------+------------------------------------------------------|
+| manage.py    | Run commands like runserver, migrate, createsuperuser |
+| settings.py  | Database config, installed apps, middleware, etc.    |
+| urls.py      | Maps URL patterns to views                           |
+| wsgi.py      | Web Server Gateway Interface for deployment          |
+| asgi.py      | Async Server Gateway Interface for async support     |
+
+* Applications
+
+** Step 4: Create a Django App
+
+Apps are modular components that handle specific functionality.
+
+#+BEGIN_SRC bash
+python manage.py startapp blog
+#+END_SRC
+
+*** App Directory Structure
+
+#+BEGIN_EXAMPLE
+blog/
+├── __init__.py        # Python package marker
+├── admin.py           # Admin panel configuration
+├── apps.py            # App configuration
+├── models.py          # Database models
+├── tests.py           # Unit tests
+├── views.py           # View functions/classes
+└── migrations/        # Database migration files
+    └── __init__.py
+#+END_EXAMPLE
+
+** Step 5: Register the App
+
+Edit =myproject/settings.py=:
+
+#+BEGIN_SRC python
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'blog',  # Add your app here
+]
+#+END_SRC
+
+*** Why Register Apps?
+
+- Django needs to know about your app to:
+  - Include it in migrations
+  - Find templates and static files
+  - Register models with admin
+  - Load app configurations
+
+* Models (Database Layer)
+
+** Step 6: Define Models
+
+Models define database table structure using Python classes.
+
+Edit =blog/models.py=:
+
+#+BEGIN_SRC python
+from django.db import models
+
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    published = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title
+#+END_SRC
+
+*** Field Types Reference
+
+| Field Type       | Description                    | Example                          |
+|------------------+--------------------------------+----------------------------------|
+| CharField        | Short text (requires max_length)| =models.CharField(max_length=100)= |
+| TextField        | Long text                      | =models.TextField()=               |
+| IntegerField     | Integer numbers                | =models.IntegerField()=            |
+| FloatField       | Floating point numbers         | =models.FloatField()=              |
+| BooleanField     | True/False values              | =models.BooleanField(default=False)= |
+| DateTimeField    | Date and time                  | =models.DateTimeField(auto_now_add=True)= |
+| DateField        | Date only                      | =models.DateField()=               |
+| EmailField       | Email validation               | =models.EmailField()=              |
+| URLField         | URL validation                 | =models.URLField()=                |
+| ForeignKey       | Many-to-one relationship       | =models.ForeignKey(User, on_delete=models.CASCADE)= |
+| ManyToManyField  | Many-to-many relationship      | =models.ManyToManyField(Tag)=      |
+
+*** Common Field Options
+
+| Option         | Description                              |
+|----------------+------------------------------------------|
+| =max_length=     | Maximum character length (required for CharField) |
+| =default=        | Default value for the field              |
+| =null=           | Allow NULL in database (default: False)  |
+| =blank=          | Allow empty in forms (default: False)    |
+| =choices=        | Limit to predefined choices              |
+| =unique=         | Enforce uniqueness                       |
+| =auto_now_add=   | Set to current datetime on creation     |
+| =auto_now=       | Update to current datetime on every save |
+
+** Step 7: Create and Apply Migrations
+
+Migrations translate model changes into database schema changes.
+
+#+BEGIN_SRC bash
+# Create migration files
+python manage.py makemigrations
+
+# Apply migrations to database
+python manage.py migrate
+#+END_SRC
+
+*** Migration Commands
+
+| Command                      | Description                        |
+|------------------------------+------------------------------------|
+| =makemigrations=               | Create new migration files         |
+| =migrate=                      | Apply pending migrations           |
+| =showmigrations=               | List all migrations and status     |
+| =sqlmigrate app_name 0001=     | Show SQL for a migration           |
+| =migrate app_name zero=        | Unapply all migrations for an app  |
+
+* Views (Business Logic)
+
+** Step 8: Create Views
+
+Views handle requests and return responses.
+
+Edit =blog/views.py=:
+
+#+BEGIN_SRC python
+from django.shortcuts import render, get_object_or_404
+from .models import Post
+
+def post_list(request):
+    """Display all published posts."""
+    posts = Post.objects.filter(published=True)
+    return render(request, 'blog/post_list.html', {'posts': posts})
+
+def post_detail(request, pk):
+    """Display a single post."""
+    post = get_object_or_404(Post, pk=pk)
+    return render(request, 'blog/post_detail.html', {'post': post})
+#+END_SRC
+
+*** View Components Explained
+
+| Component              | Purpose                                    |
+|------------------------+--------------------------------------------|
+| =request=                | HTTP request object with user data, method |
+| =render()=               | Combines template with context data        |
+| =get_object_or_404()=    | Fetch object or return 404 error           |
+| =Post.objects=           | Model manager for database queries         |
+| =filter()=               | Query with conditions                      |
+| Context dictionary     | Data passed to template                    |
+
+*** Common QuerySet Methods
+
+#+BEGIN_SRC python
+# Get all objects
+Post.objects.all()
+
+# Filter with conditions
+Post.objects.filter(published=True)
+
+# Exclude records
+Post.objects.exclude(published=False)
+
+# Get single object (raises exception if not found)
+Post.objects.get(pk=1)
+
+# Order results
+Post.objects.order_by('-created_at')  # Descending
+Post.objects.order_by('title')        # Ascending
+
+# Limit results
+Post.objects.all()[:5]  # First 5
+
+# Count records
+Post.objects.count()
+
+# Check existence
+Post.objects.filter(title='Hello').exists()
+#+END_SRC
+
+* URL Routing
+
+** Step 9: Create App URLs
+
+Create =blog/urls.py=:
+
+#+BEGIN_SRC python
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.post_list, name='post_list'),
+    path('post/<int:pk>/', views.post_detail, name='post_detail'),
+]
+#+END_SRC
+
+*** URL Pattern Syntax
+
+| Pattern            | Description                      | Example Match        |
+|--------------------+----------------------------------+----------------------|
+| =''=                 | Empty path (root)                | =/=                    |
+| ='posts/'=           | Literal string                   | =/posts/=              |
+| ='<int:pk>/'=        | Integer parameter                | =/5/=                  |
+| ='<str:slug>/'=      | String parameter                 | =/hello-world/=        |
+| ='<slug:slug>/'=     | Slug (letters, numbers, hyphens) | =/my-post-123/=        |
+| ='<uuid:id>/'=       | UUID parameter                   | =/550e8400-e29b.../=   |
+
+** Step 10: Include App URLs in Project
+
+Edit =myproject/urls.py=:
+
+#+BEGIN_SRC python
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('blog.urls')),  # Include app URLs
+]
+#+END_SRC
+
+*** Why Use =include()=?
+
+- Keeps URLs modular and organized
+- Each app manages its own URLs
+- Makes apps reusable across projects
+- Easier to maintain large projects
+
+* Templates (Presentation Layer)
+
+** Step 11: Create Template Directory
+
+#+BEGIN_SRC bash
+mkdir -p blog/templates/blog
+#+END_SRC
+
+*** Template Directory Structure
+
+#+BEGIN_EXAMPLE
+blog/
+└── templates/
+    └── blog/              # Namespaced to avoid conflicts
+        ├── base.html      # Base template (optional)
+        ├── post_list.html
+        └── post_detail.html
+#+END_EXAMPLE
+
+** Step 12: Create Post List Template
+
+Create =blog/templates/blog/post_list.html=:
+
+#+BEGIN_SRC html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        article { border-bottom: 1px solid #ddd; padding: 20px 0; }
+        h2 a { color: #333; text-decoration: none; }
+        h2 a:hover { color: #007bff; }
+        small { color: #666; }
+    </style>
+</head>
+<body>
+    <h1>My Blog</h1>
+
+    {% for post in posts %}
+        <article>
+            <h2><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h2>
+            <p>{{ post.content|truncatewords:30 }}</p>
+            <small>Published: {{ post.created_at|date:"F d, Y" }}</small>
+        </article>
+    {% empty %}
+        <p>No posts available yet.</p>
+    {% endfor %}
+</body>
+</html>
+#+END_SRC
+
+** Step 13: Create Post Detail Template
+
+Create =blog/templates/blog/post_detail.html=:
+
+#+BEGIN_SRC html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ post.title }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .meta { color: #666; margin-bottom: 20px; }
+        .back-link { display: inline-block; margin-top: 20px; color: #007bff; }
+    </style>
+</head>
+<body>
+    <article>
+        <h1>{{ post.title }}</h1>
+        <p class="meta">Published: {{ post.created_at|date:"F d, Y H:i" }}</p>
+        <div class="content">
+            {{ post.content|linebreaks }}
+        </div>
+    </article>
+
+    <a href="{% url 'post_list' %}" class="back-link">&larr; Back to all posts</a>
+</body>
+</html>
+#+END_SRC
+
+*** Template Tags and Filters
+
+**** Common Template Tags
+
+| Tag                        | Purpose                          |
+|----------------------------+----------------------------------|
+| ={% for item in list %}=     | Loop through items               |
+| ={% if condition %}=         | Conditional rendering            |
+| ={% url 'name' %}=           | Generate URL by name             |
+| ={% include 'file.html' %}=  | Include another template         |
+| ={% extends 'base.html' %}=  | Inherit from base template       |
+| ={% block name %}=           | Define overridable block         |
+| ={% csrf_token %}=           | CSRF protection for forms        |
+| ={% load static %}=          | Load static files tag library    |
+
+**** Common Template Filters
+
+| Filter                   | Purpose                          | Example                    |
+|--------------------------+----------------------------------+----------------------------|
+| =truncatewords:N=          | Limit to N words                 | ={{ text\|truncatewords:30 }}= |
+| =date:"format"=            | Format date                      | ={{ date\|date:"F d, Y" }}=   |
+| =linebreaks=               | Convert newlines to =<p>= and =<br>= | ={{ text\|linebreaks }}=      |
+| =safe=                     | Mark as safe HTML                | ={{ html\|safe }}=            |
+| =default:"value"=          | Default if empty                 | ={{ var\|default:"N/A" }}=    |
+| =length=                   | Get length                       | ={{ list\|length }}=          |
+| =lower= / =upper=            | Change case                      | ={{ text\|upper }}=           |
+| =slugify=                  | Convert to slug                  | ={{ title\|slugify }}=        |
+
+* Admin Interface
+
+** Step 14: Register Models with Admin
+
+Edit =blog/admin.py=:
+
+#+BEGIN_SRC python
+from django.contrib import admin
+from .models import Post
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    list_display = ['title', 'created_at', 'published']
+    list_filter = ['published', 'created_at']
+    search_fields = ['title', 'content']
+    list_editable = ['published']
+    ordering = ['-created_at']
+#+END_SRC
+
+*** Admin Options Reference
+
+| Option            | Purpose                                   |
+|-------------------+-------------------------------------------|
+| =list_display=      | Fields to show in list view               |
+| =list_filter=       | Add filter sidebar                        |
+| =search_fields=     | Enable search on these fields             |
+| =list_editable=     | Allow editing in list view                |
+| =ordering=          | Default sort order                        |
+| =readonly_fields=   | Fields that cannot be edited              |
+| =prepopulated_fields= | Auto-fill fields (e.g., slug from title) |
+| =date_hierarchy=    | Add date-based navigation                 |
+
+** Step 15: Create Superuser
+
+#+BEGIN_SRC bash
+python manage.py createsuperuser
+#+END_SRC
+
+Follow the prompts to set:
+- Username
+- Email (optional)
+- Password
+
+* Running the Server
+
+** Step 16: Start Development Server
+
+#+BEGIN_SRC bash
+python manage.py runserver
+#+END_SRC
+
+*** Available URLs
+
+| URL                         | Description              |
+|-----------------------------+--------------------------|
+| http://127.0.0.1:8000/      | Blog post list           |
+| http://127.0.0.1:8000/post/1/ | Individual post (pk=1)   |
+| http://127.0.0.1:8000/admin/  | Admin interface          |
+
+*** Runserver Options
+
+#+BEGIN_SRC bash
+# Run on different port
+python manage.py runserver 8080
+
+# Run on all interfaces (for network access)
+python manage.py runserver 0.0.0.0:8000
+#+END_SRC
+
+* Quick Reference
+
+** Essential manage.py Commands
+
+| Command                   | Description                        |
+|---------------------------+------------------------------------|
+| =runserver=                 | Start development server           |
+| =startapp app_name=         | Create new app                     |
+| =makemigrations=            | Create migration files             |
+| =migrate=                   | Apply migrations                   |
+| =createsuperuser=           | Create admin user                  |
+| =shell=                     | Interactive Python shell with Django |
+| =dbshell=                   | Database command line              |
+| =collectstatic=             | Gather static files for deployment |
+| =test=                      | Run tests                          |
+| =check=                     | Check for project issues           |
+
+** Django Project Checklist
+
+- [ ] Create virtual environment
+- [ ] Install Django
+- [ ] Create project with =django-admin startproject=
+- [ ] Create app with =python manage.py startapp=
+- [ ] Add app to =INSTALLED_APPS=
+- [ ] Define models in =models.py=
+- [ ] Run =makemigrations= and =migrate=
+- [ ] Create views in =views.py=
+- [ ] Create =urls.py= in app
+- [ ] Include app URLs in project =urls.py=
+- [ ] Create templates directory
+- [ ] Create HTML templates
+- [ ] Register models in =admin.py=
+- [ ] Create superuser
+- [ ] Run server and test
+
+* Next Steps
+** Topics to Explore
+
+1. *Forms*: User input handling with =django.forms=
+2. *Authentication*: Login, logout, registration with =django.contrib.auth=
+3. *Static Files*: CSS, JavaScript, images
+4. *Class-Based Views*: Reusable view patterns
+5. *REST APIs*: Django REST Framework
+6. *Testing*: Unit and integration tests
+7. *Deployment*: Gunicorn, Nginx, Docker
+
+** Useful Resources
+
+- Official Documentation: https://docs.djangoproject.com/
+- Django Girls Tutorial: https://tutorial.djangogirls.org/
+- Two Scoops of Django (Book)
+- Django REST Framework: https://www.django-rest-framework.org/

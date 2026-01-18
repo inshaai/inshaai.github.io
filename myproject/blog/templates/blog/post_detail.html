@@ -1,0 +1,61 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .post-header {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+    .post-header h1 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+    .post-meta {
+        color: #666;
+        font-size: 0.9em;
+    }
+    .post-content {
+        font-size: 1.1em;
+        line-height: 1.8;
+    }
+    .post-content p {
+        margin-bottom: 1.5em;
+    }
+    .back-link {
+        display: inline-block;
+        margin-top: 30px;
+        padding: 10px 20px;
+        background-color: #3498db;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+    .back-link:hover {
+        background-color: #2980b9;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<article>
+    <div class="post-header">
+        <h1>{{ post.title }}</h1>
+        <p class="post-meta">
+            Published on {{ post.created_at|date:"F d, Y \a\t H:i" }}
+            {% if post.updated_at != post.created_at %}
+                | Updated on {{ post.updated_at|date:"F d, Y" }}
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="post-content">
+        {{ post.content|linebreaks }}
+    </div>
+</article>
+
+<a href="{% url 'post_list' %}" class="back-link">&larr; Back to all posts</a>
+{% endblock %}

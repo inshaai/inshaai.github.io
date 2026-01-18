@@ -1,0 +1,57 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Blog Posts{% endblock %}
+
+{% block extra_css %}
+<style>
+    article {
+        border-bottom: 1px solid #eee;
+        padding: 25px 0;
+    }
+    article:last-child {
+        border-bottom: none;
+    }
+    article h2 {
+        margin-bottom: 10px;
+    }
+    article h2 a {
+        color: #2c3e50;
+        text-decoration: none;
+    }
+    article h2 a:hover {
+        color: #3498db;
+    }
+    article .meta {
+        color: #666;
+        font-size: 0.9em;
+        margin-bottom: 15px;
+    }
+    article .excerpt {
+        color: #555;
+    }
+    .no-posts {
+        text-align: center;
+        padding: 50px;
+        color: #666;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Latest Posts</h1>
+
+{% for post in posts %}
+    <article>
+        <h2><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h2>
+        <p class="meta">
+            Published on {{ post.created_at|date:"F d, Y" }}
+        </p>
+        <p class="excerpt">{{ post.content|truncatewords:40 }}</p>
+    </article>
+{% empty %}
+    <div class="no-posts">
+        <p>No posts available yet.</p>
+        <p>Visit the <a href="{% url 'admin:index' %}">admin panel</a> to create your first post.</p>
+    </div>
+{% endfor %}
+{% endblock %}
