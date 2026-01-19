@@ -231,6 +231,23 @@
         <li class="sub-item"><a href="#login-logout">Login/Logout</a></li>
         <li class="sub-item"><a href="#registration">Registration</a></li>
         <li class="sub-item"><a href="#protecting-views">Protecting Views</a></li>
+        <li><a href="#static-files">Static Files</a></li>
+        <li class="sub-item"><a href="#static-config">Configuration</a></li>
+        <li class="sub-item"><a href="#static-templates">Using in Templates</a></li>
+        <li><a href="#cbv">Class-Based Views</a></li>
+        <li class="sub-item"><a href="#generic-views">Generic Views</a></li>
+        <li class="sub-item"><a href="#mixins">Mixins</a></li>
+        <li><a href="#rest-api">REST APIs</a></li>
+        <li class="sub-item"><a href="#drf-setup">DRF Setup</a></li>
+        <li class="sub-item"><a href="#serializers">Serializers</a></li>
+        <li class="sub-item"><a href="#api-views">API Views</a></li>
+        <li><a href="#testing">Testing</a></li>
+        <li class="sub-item"><a href="#test-models">Testing Models</a></li>
+        <li class="sub-item"><a href="#test-views">Testing Views</a></li>
+        <li><a href="#deployment">Deployment</a></li>
+        <li class="sub-item"><a href="#deploy-prep">Preparation</a></li>
+        <li class="sub-item"><a href="#gunicorn">Gunicorn</a></li>
+        <li class="sub-item"><a href="#docker">Docker</a></li>
         <li><a href="#running">Running the Server</a></li>
         <li><a href="#reference">Quick Reference</a></li>
         <li><a href="#next-steps">Next Steps</a></li>
@@ -2305,6 +2322,1022 @@ class PostDeleteView(PermissionRequiredMixin, DeleteView):
         </ul>
       </div>
 
+      <h2 id="static-files">Static Files</h2>
+      <p>
+        Static files are CSS, JavaScript, and images that don't change dynamically.
+        Django provides a robust system for managing and serving static files.
+      </p>
+
+      <h3 id="static-config">Configuration</h3>
+      <p>Configure static files in <code>settings.py</code>:</p>
+
+<pre><code class="language-python"># settings.py
+
+# URL prefix for static files
+STATIC_URL = '/static/'
+
+# Directory where collectstatic will gather files for production
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Additional directories to search for static files
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # Project-level static files
+]
+
+# For development, Django serves static files automatically
+# For production, use WhiteNoise or a web server like Nginx</code></pre>
+
+      <h3>Project Structure for Static Files</h3>
+
+      <div class="file-tree">
+myproject/<br>
+├── static/                    # Project-level static files<br>
+│   ├── css/<br>
+│   │   └── style.css<br>
+│   ├── js/<br>
+│   │   └── main.js<br>
+│   └── images/<br>
+│       └── logo.png<br>
+├── blog/<br>
+│   └── static/<br>
+│       └── blog/              # App-level static files (namespaced)<br>
+│           ├── css/<br>
+│           │   └── blog.css<br>
+│           └── js/<br>
+│               └── blog.js<br>
+└── staticfiles/               # Collected static files (production)
+      </div>
+
+      <h3 id="static-templates">Using Static Files in Templates</h3>
+
+<pre><code class="language-html">{% load static %}
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;!-- CSS files --&gt;
+    &lt;link rel="stylesheet" href="{% static 'css/style.css' %}"&gt;
+    &lt;link rel="stylesheet" href="{% static 'blog/css/blog.css' %}"&gt;
+
+    &lt;!-- Favicon --&gt;
+    &lt;link rel="icon" href="{% static 'images/favicon.ico' %}"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;!-- Images --&gt;
+    &lt;img src="{% static 'images/logo.png' %}" alt="Logo"&gt;
+
+    &lt;!-- JavaScript files --&gt;
+    &lt;script src="{% static 'js/main.js' %}"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+      <h3>Collecting Static Files for Production</h3>
+
+<pre><code class="language-bash"># Collect all static files into STATIC_ROOT
+python manage.py collectstatic
+
+# This copies all static files from apps and STATICFILES_DIRS
+# to the STATIC_ROOT directory for serving in production</code></pre>
+
+      <h3>Serving Static Files with WhiteNoise</h3>
+      <p>WhiteNoise allows Django to serve static files in production:</p>
+
+<pre><code class="language-bash">pip install whitenoise</code></pre>
+
+<pre><code class="language-python"># settings.py
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add after SecurityMiddleware
+    # ... other middleware
+]
+
+# Enable compression and caching
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'</code></pre>
+
+      <h3>Media Files (User Uploads)</h3>
+      <p>Configure media files for user uploads:</p>
+
+<pre><code class="language-python"># settings.py
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'</code></pre>
+
+<pre><code class="language-python"># urls.py (development only)
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    # ... your URLs
+]
+
+# Serve media files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)</code></pre>
+
+      <div class="note">
+        <strong>Static vs Media Files:</strong>
+        <ul>
+          <li><strong>Static files:</strong> CSS, JS, images that are part of your application</li>
+          <li><strong>Media files:</strong> User-uploaded content (profile photos, documents)</li>
+          <li>In production, use a CDN or dedicated storage (S3) for media files</li>
+        </ul>
+      </div>
+
+      <h2 id="cbv">Class-Based Views</h2>
+      <p>
+        Class-Based Views (CBVs) provide reusable view patterns through inheritance.
+        They're especially useful for common operations like displaying lists, details, and forms.
+      </p>
+
+      <h3>Function-Based vs Class-Based Views</h3>
+
+<pre><code class="language-python"># Function-based view
+def post_list(request):
+    posts = Post.objects.all()
+    return render(request, 'blog/post_list.html', {'posts': posts})
+
+# Equivalent class-based view
+from django.views.generic import ListView
+
+class PostListView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'</code></pre>
+
+      <h3>URL Configuration for CBVs</h3>
+
+<pre><code class="language-python"># urls.py
+from django.urls import path
+from .views import PostListView, PostDetailView, PostCreateView
+
+urlpatterns = [
+    path('', PostListView.as_view(), name='post_list'),
+    path('post/&lt;int:pk&gt;/', PostDetailView.as_view(), name='post_detail'),
+    path('post/new/', PostCreateView.as_view(), name='post_create'),
+]</code></pre>
+
+      <h3 id="generic-views">Generic Views</h3>
+      <p>Django provides built-in generic views for common patterns:</p>
+
+<pre><code class="language-python">from django.views.generic import (
+    ListView, DetailView, CreateView, UpdateView, DeleteView,
+    TemplateView, RedirectView
+)
+from django.urls import reverse_lazy
+from .models import Post
+
+# Display a list of objects
+class PostListView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+    paginate_by = 10
+    ordering = ['-created_at']
+
+    # Custom queryset
+    def get_queryset(self):
+        return Post.objects.filter(published=True)
+
+# Display a single object
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'blog/post_detail.html'
+    context_object_name = 'post'
+
+    # Add extra context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['related_posts'] = Post.objects.exclude(pk=self.object.pk)[:3]
+        return context
+
+# Create a new object
+class PostCreateView(CreateView):
+    model = Post
+    fields = ['title', 'content']
+    template_name = 'blog/post_form.html'
+    success_url = reverse_lazy('post_list')
+
+    # Set the author to current user
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+# Update an existing object
+class PostUpdateView(UpdateView):
+    model = Post
+    fields = ['title', 'content', 'published']
+    template_name = 'blog/post_form.html'
+
+    def get_success_url(self):
+        return reverse_lazy('post_detail', kwargs={'pk': self.object.pk})
+
+# Delete an object
+class PostDeleteView(DeleteView):
+    model = Post
+    template_name = 'blog/post_confirm_delete.html'
+    success_url = reverse_lazy('post_list')
+
+# Simple template rendering
+class AboutView(TemplateView):
+    template_name = 'blog/about.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'About Us'
+        return context
+
+# Redirect to another URL
+class OldPostRedirectView(RedirectView):
+    pattern_name = 'post_detail'  # Name of URL to redirect to
+
+    def get_redirect_url(self, *args, **kwargs):
+        # Custom redirect logic
+        return super().get_redirect_url(*args, **kwargs)</code></pre>
+
+      <h3>Generic View Reference</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>View</th>
+            <th>Purpose</th>
+            <th>Key Attributes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>ListView</code></td>
+            <td>Display list of objects</td>
+            <td>model, paginate_by, ordering</td>
+          </tr>
+          <tr>
+            <td><code>DetailView</code></td>
+            <td>Display single object</td>
+            <td>model, slug_field, pk_url_kwarg</td>
+          </tr>
+          <tr>
+            <td><code>CreateView</code></td>
+            <td>Create new object</td>
+            <td>model, fields, form_class, success_url</td>
+          </tr>
+          <tr>
+            <td><code>UpdateView</code></td>
+            <td>Update existing object</td>
+            <td>model, fields, form_class</td>
+          </tr>
+          <tr>
+            <td><code>DeleteView</code></td>
+            <td>Delete object</td>
+            <td>model, success_url</td>
+          </tr>
+          <tr>
+            <td><code>TemplateView</code></td>
+            <td>Render a template</td>
+            <td>template_name</td>
+          </tr>
+          <tr>
+            <td><code>RedirectView</code></td>
+            <td>Redirect to URL</td>
+            <td>url, pattern_name, permanent</td>
+          </tr>
+          <tr>
+            <td><code>FormView</code></td>
+            <td>Display and process form</td>
+            <td>form_class, success_url</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="mixins">Mixins</h3>
+      <p>Mixins add reusable functionality to class-based views:</p>
+
+<pre><code class="language-python">from django.contrib.auth.mixins import (
+    LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+)
+from django.views.generic import CreateView, UpdateView, DeleteView
+
+# Require login
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    fields = ['title', 'content']
+    login_url = '/login/'  # Redirect if not logged in
+
+# Require specific permission
+class PostDeleteView(PermissionRequiredMixin, DeleteView):
+    model = Post
+    permission_required = 'blog.delete_post'
+    success_url = '/'
+
+# Custom access test
+class PostUpdateView(UserPassesTestMixin, UpdateView):
+    model = Post
+    fields = ['title', 'content']
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author  # Only author can edit
+
+# Multiple mixins (order matters - left to right)
+class PostEditView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Post
+    fields = ['title', 'content']
+
+    def test_func(self):
+        return self.request.user == self.get_object().author</code></pre>
+
+      <h3>Custom Mixins</h3>
+
+<pre><code class="language-python">from django.contrib import messages
+
+class SuccessMessageMixin:
+    """Add a success message on form submission."""
+    success_message = "Operation completed successfully."
+
+    def form_valid(self, form):
+        messages.success(self.request, self.success_message)
+        return super().form_valid(form)
+
+class AuthorRequiredMixin(UserPassesTestMixin):
+    """Only allow the author to access."""
+
+    def test_func(self):
+        obj = self.get_object()
+        return self.request.user == obj.author
+
+# Using custom mixins
+class PostUpdateView(LoginRequiredMixin, AuthorRequiredMixin,
+                     SuccessMessageMixin, UpdateView):
+    model = Post
+    fields = ['title', 'content']
+    success_message = "Post updated successfully!"</code></pre>
+
+      <h2 id="rest-api">REST APIs</h2>
+      <p>
+        Django REST Framework (DRF) is the go-to library for building Web APIs with Django.
+        It provides powerful tools for serialization, authentication, and viewsets.
+      </p>
+
+      <h3 id="drf-setup">Installation and Setup</h3>
+
+<pre><code class="language-bash">pip install djangorestframework</code></pre>
+
+<pre><code class="language-python"># settings.py
+INSTALLED_APPS = [
+    # ...
+    'rest_framework',
+]
+
+# Optional: DRF settings
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}</code></pre>
+
+      <h3 id="serializers">Serializers</h3>
+      <p>Serializers convert model instances to JSON and validate input data:</p>
+
+<pre><code class="language-python"># blog/serializers.py
+from rest_framework import serializers
+from .models import Post
+
+# Basic ModelSerializer
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'content', 'created_at', 'published']
+        read_only_fields = ['id', 'created_at']
+
+# With custom fields and validation
+class PostDetailSerializer(serializers.ModelSerializer):
+    author_name = serializers.CharField(source='author.username', read_only=True)
+    word_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'content', 'author_name', 'word_count',
+                  'created_at', 'published']
+
+    def get_word_count(self, obj):
+        return len(obj.content.split())
+
+    def validate_title(self, value):
+        if len(value) < 5:
+            raise serializers.ValidationError("Title must be at least 5 characters.")
+        return value
+
+# Nested serializers
+class AuthorSerializer(serializers.ModelSerializer):
+    posts = PostSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'posts']</code></pre>
+
+      <h3 id="api-views">API Views</h3>
+      <p>Create API endpoints using views or viewsets:</p>
+
+<pre><code class="language-python"># blog/views.py
+from rest_framework import generics, viewsets, status
+from rest_framework.decorators import api_view, action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from .models import Post
+from .serializers import PostSerializer
+
+# Function-based API view
+@api_view(['GET', 'POST'])
+def post_list_api(request):
+    if request.method == 'GET':
+        posts = Post.objects.all()
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = PostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# Generic API views
+class PostListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+class PostDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+# ViewSets (combines list, create, retrieve, update, delete)
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        queryset = Post.objects.all()
+        published = self.request.query_params.get('published')
+        if published is not None:
+            queryset = queryset.filter(published=published == 'true')
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    # Custom action
+    @action(detail=True, methods=['post'])
+    def publish(self, request, pk=None):
+        post = self.get_object()
+        post.published = True
+        post.save()
+        return Response({'status': 'published'})</code></pre>
+
+      <h3>API URL Configuration</h3>
+
+<pre><code class="language-python"># blog/urls.py
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import PostViewSet, PostListCreateAPIView, PostDetailAPIView
+
+# Using router for ViewSets
+router = DefaultRouter()
+router.register(r'posts', PostViewSet, basename='post')
+
+urlpatterns = [
+    # Router URLs
+    path('api/', include(router.urls)),
+
+    # Or individual generic views
+    path('api/posts/', PostListCreateAPIView.as_view(), name='post-list'),
+    path('api/posts/&lt;int:pk&gt;/', PostDetailAPIView.as_view(), name='post-detail'),
+]</code></pre>
+
+      <h3>API Authentication</h3>
+
+<pre><code class="language-python"># Token authentication setup
+# settings.py
+INSTALLED_APPS = [
+    # ...
+    'rest_framework.authtoken',
+]
+
+# Run: python manage.py migrate
+
+# Create tokens for users
+from rest_framework.authtoken.models import Token
+token = Token.objects.create(user=user)
+print(token.key)  # Use this token in API requests
+
+# In API requests, add header:
+# Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b</code></pre>
+
+      <div class="note">
+        <strong>DRF Features:</strong>
+        <ul>
+          <li>Browsable API interface at /api/</li>
+          <li>Automatic API documentation with drf-spectacular or drf-yasg</li>
+          <li>Built-in throttling and rate limiting</li>
+          <li>Filtering, searching, and ordering with django-filter</li>
+        </ul>
+      </div>
+
+      <h2 id="testing">Testing</h2>
+      <p>
+        Django provides a robust testing framework built on Python's unittest.
+        Write tests to ensure your code works correctly and catch regressions.
+      </p>
+
+      <h3>Test Structure</h3>
+
+      <div class="file-tree">
+blog/<br>
+├── tests/<br>
+│   ├── __init__.py<br>
+│   ├── test_models.py<br>
+│   ├── test_views.py<br>
+│   ├── test_forms.py<br>
+│   └── test_api.py<br>
+└── tests.py              # Or use single file for small apps
+      </div>
+
+      <h3 id="test-models">Testing Models</h3>
+
+<pre><code class="language-python"># blog/tests/test_models.py
+from django.test import TestCase
+from django.contrib.auth.models import User
+from blog.models import Post
+
+class PostModelTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        """Set up data for the whole TestCase."""
+        cls.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123'
+        )
+        cls.post = Post.objects.create(
+            title='Test Post',
+            content='Test content here',
+            author=cls.user,
+            published=True
+        )
+
+    def test_post_creation(self):
+        """Test that a post is created correctly."""
+        self.assertEqual(self.post.title, 'Test Post')
+        self.assertEqual(self.post.author.username, 'testuser')
+        self.assertTrue(self.post.published)
+
+    def test_post_str_method(self):
+        """Test the __str__ method."""
+        self.assertEqual(str(self.post), 'Test Post')
+
+    def test_post_title_max_length(self):
+        """Test title field max length."""
+        max_length = self.post._meta.get_field('title').max_length
+        self.assertEqual(max_length, 200)
+
+    def test_post_ordering(self):
+        """Test default ordering."""
+        Post.objects.create(
+            title='Second Post',
+            content='More content',
+            author=self.user
+        )
+        posts = Post.objects.all()
+        # Assuming ordering = ['-created_at']
+        self.assertEqual(posts[0].title, 'Second Post')</code></pre>
+
+      <h3 id="test-views">Testing Views</h3>
+
+<pre><code class="language-python"># blog/tests/test_views.py
+from django.test import TestCase, Client
+from django.urls import reverse
+from django.contrib.auth.models import User
+from blog.models import Post
+
+class PostViewTest(TestCase):
+
+    def setUp(self):
+        """Set up for each test method."""
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123'
+        )
+        self.post = Post.objects.create(
+            title='Test Post',
+            content='Test content',
+            author=self.user,
+            published=True
+        )
+
+    def test_post_list_view(self):
+        """Test the post list page."""
+        response = self.client.get(reverse('post_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'blog/post_list.html')
+        self.assertContains(response, 'Test Post')
+
+    def test_post_detail_view(self):
+        """Test the post detail page."""
+        response = self.client.get(
+            reverse('post_detail', kwargs={'pk': self.post.pk})
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Test content')
+
+    def test_post_detail_404(self):
+        """Test 404 for non-existent post."""
+        response = self.client.get(
+            reverse('post_detail', kwargs={'pk': 9999})
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_post_create_requires_login(self):
+        """Test that creating a post requires login."""
+        response = self.client.get(reverse('post_create'))
+        self.assertEqual(response.status_code, 302)  # Redirect to login
+
+    def test_post_create_authenticated(self):
+        """Test creating a post when logged in."""
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.post(reverse('post_create'), {
+            'title': 'New Post',
+            'content': 'New content',
+        })
+        self.assertEqual(response.status_code, 302)  # Redirect on success
+        self.assertTrue(Post.objects.filter(title='New Post').exists())
+
+class PostFormTest(TestCase):
+
+    def test_valid_form(self):
+        """Test form with valid data."""
+        from blog.forms import PostForm
+        form = PostForm(data={
+            'title': 'Valid Title',
+            'content': 'Valid content here',
+        })
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_form_empty_title(self):
+        """Test form with empty title."""
+        from blog.forms import PostForm
+        form = PostForm(data={
+            'title': '',
+            'content': 'Some content',
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn('title', form.errors)</code></pre>
+
+      <h3>Testing API Endpoints</h3>
+
+<pre><code class="language-python"># blog/tests/test_api.py
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
+from django.contrib.auth.models import User
+from blog.models import Post
+
+class PostAPITest(APITestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123'
+        )
+        self.post = Post.objects.create(
+            title='Test Post',
+            content='Test content',
+            author=self.user,
+            published=True
+        )
+
+    def test_list_posts(self):
+        """Test retrieving list of posts."""
+        url = reverse('post-list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), 1)
+
+    def test_create_post_authenticated(self):
+        """Test creating a post when authenticated."""
+        self.client.force_authenticate(user=self.user)
+        url = reverse('post-list')
+        data = {'title': 'New Post', 'content': 'New content'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_create_post_unauthenticated(self):
+        """Test that unauthenticated users cannot create posts."""
+        url = reverse('post-list')
+        data = {'title': 'New Post', 'content': 'New content'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)</code></pre>
+
+      <h3>Running Tests</h3>
+
+<pre><code class="language-bash"># Run all tests
+python manage.py test
+
+# Run tests for specific app
+python manage.py test blog
+
+# Run specific test file
+python manage.py test blog.tests.test_models
+
+# Run specific test class
+python manage.py test blog.tests.test_models.PostModelTest
+
+# Run specific test method
+python manage.py test blog.tests.test_models.PostModelTest.test_post_creation
+
+# Run with verbosity
+python manage.py test -v 2
+
+# Run with coverage
+pip install coverage
+coverage run manage.py test
+coverage report
+coverage html  # Generate HTML report</code></pre>
+
+      <div class="note">
+        <strong>Testing Best Practices:</strong>
+        <ul>
+          <li>Use <code>setUpTestData()</code> for class-wide test data (faster)</li>
+          <li>Use <code>setUp()</code> for data that changes between tests</li>
+          <li>Test both success and failure cases</li>
+          <li>Use factories (factory_boy) for complex test data</li>
+          <li>Aim for high coverage on critical paths</li>
+        </ul>
+      </div>
+
+      <h2 id="deployment">Deployment</h2>
+      <p>
+        Deploy your Django application to production with proper security,
+        performance, and reliability configurations.
+      </p>
+
+      <h3 id="deploy-prep">Production Preparation</h3>
+
+<pre><code class="language-python"># settings.py - Production settings
+
+import os
+from pathlib import Path
+
+# SECURITY: Don't run with debug in production
+DEBUG = False
+
+# SECURITY: Set your domain(s)
+ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
+
+# SECURITY: Keep secret key secure (use environment variable)
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+
+# Database (PostgreSQL recommended for production)
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
+    }
+}
+
+# Static files
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Security settings
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'django.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}</code></pre>
+
+      <h3>Requirements File</h3>
+
+<pre><code class="language-bash"># Generate requirements.txt
+pip freeze > requirements.txt
+
+# requirements.txt example
+Django==5.0
+gunicorn==21.2.0
+psycopg2-binary==2.9.9
+whitenoise==6.6.0
+python-dotenv==1.0.0</code></pre>
+
+      <h3 id="gunicorn">Gunicorn (WSGI Server)</h3>
+      <p>Gunicorn is a production-ready WSGI HTTP server:</p>
+
+<pre><code class="language-bash"># Install
+pip install gunicorn
+
+# Run (basic)
+gunicorn myproject.wsgi:application
+
+# Run with workers
+gunicorn myproject.wsgi:application --workers 3
+
+# Run with binding
+gunicorn myproject.wsgi:application --bind 0.0.0.0:8000
+
+# Production command
+gunicorn myproject.wsgi:application \
+    --workers 3 \
+    --bind unix:/run/gunicorn.sock \
+    --access-logfile /var/log/gunicorn/access.log \
+    --error-logfile /var/log/gunicorn/error.log</code></pre>
+
+      <h3>Nginx Configuration</h3>
+      <p>Use Nginx as a reverse proxy in front of Gunicorn:</p>
+
+<pre><code class="language-nginx"># /etc/nginx/sites-available/myproject
+server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
+
+    # Redirect HTTP to HTTPS
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name yourdomain.com www.yourdomain.com;
+
+    # SSL configuration
+    ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+
+    # Static files
+    location /static/ {
+        alias /path/to/myproject/staticfiles/;
+    }
+
+    # Media files
+    location /media/ {
+        alias /path/to/myproject/media/;
+    }
+
+    # Proxy to Gunicorn
+    location / {
+        proxy_pass http://unix:/run/gunicorn.sock;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}</code></pre>
+
+      <h3 id="docker">Docker Deployment</h3>
+      <p>Containerize your Django application:</p>
+
+<pre><code class="language-dockerfile"># Dockerfile
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Set work directory
+WORKDIR /app
+
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy project
+COPY . .
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# Run gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "myproject.wsgi:application"]</code></pre>
+
+<pre><code class="language-yaml"># docker-compose.yml
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=db
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./staticfiles:/static
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:</code></pre>
+
+      <h3>Docker Commands</h3>
+
+<pre><code class="language-bash"># Build and run
+docker-compose up --build
+
+# Run in background
+docker-compose up -d
+
+# Run migrations
+docker-compose exec web python manage.py migrate
+
+# Create superuser
+docker-compose exec web python manage.py createsuperuser
+
+# View logs
+docker-compose logs -f web
+
+# Stop containers
+docker-compose down</code></pre>
+
+      <h3>Deployment Checklist</h3>
+      <ul>
+        <li>Set <code>DEBUG = False</code></li>
+        <li>Set <code>ALLOWED_HOSTS</code></li>
+        <li>Use environment variables for secrets</li>
+        <li>Configure production database (PostgreSQL)</li>
+        <li>Run <code>collectstatic</code></li>
+        <li>Set up HTTPS with SSL certificate</li>
+        <li>Configure security headers</li>
+        <li>Set up logging and monitoring</li>
+        <li>Configure backups</li>
+        <li>Run <code>python manage.py check --deploy</code></li>
+      </ul>
+
+      <div class="note">
+        <strong>Deployment Platforms:</strong>
+        <ul>
+          <li><strong>PaaS:</strong> Heroku, Railway, Render, PythonAnywhere</li>
+          <li><strong>VPS:</strong> DigitalOcean, Linode, AWS EC2</li>
+          <li><strong>Containers:</strong> AWS ECS, Google Cloud Run, Kubernetes</li>
+          <li><strong>Serverless:</strong> AWS Lambda with Zappa</li>
+        </ul>
+      </div>
+
       <h2 id="running">Running the Server</h2>
 
       <h3>Step 16: Start Development Server</h3>
@@ -2420,16 +3453,32 @@ python manage.py runserver 0.0.0.0:8000</code></pre>
 
       <h2 id="next-steps">Next Steps</h2>
 
-      <h3>Topics to Explore</h3>
+      <h3>What You've Learned</h3>
+      <p>This tutorial covered the complete Django development workflow:</p>
       <ol>
-        <li><strong>Forms:</strong> User input handling with <code>django.forms</code></li>
-        <li><strong>Authentication:</strong> Login, logout, registration with <code>django.contrib.auth</code></li>
-        <li><strong>Static Files:</strong> CSS, JavaScript, images</li>
-        <li><strong>Class-Based Views:</strong> Reusable view patterns</li>
-        <li><strong>REST APIs:</strong> Django REST Framework</li>
-        <li><strong>Testing:</strong> Unit and integration tests</li>
-        <li><strong>Deployment:</strong> Gunicorn, Nginx, Docker</li>
+        <li><strong>Project Setup:</strong> Virtual environments, installation, and project structure</li>
+        <li><strong>Models:</strong> Database design, field types, and migrations</li>
+        <li><strong>Views:</strong> Function-based and class-based views</li>
+        <li><strong>Templates:</strong> Django template language, tags, and filters</li>
+        <li><strong>Forms:</strong> User input handling, validation, ModelForms, and formsets</li>
+        <li><strong>Authentication:</strong> Login, logout, registration, and permissions</li>
+        <li><strong>Static Files:</strong> CSS, JavaScript, images, and WhiteNoise</li>
+        <li><strong>Class-Based Views:</strong> Generic views and mixins</li>
+        <li><strong>REST APIs:</strong> Django REST Framework, serializers, and viewsets</li>
+        <li><strong>Testing:</strong> Unit tests for models, views, and APIs</li>
+        <li><strong>Deployment:</strong> Production settings, Gunicorn, Nginx, and Docker</li>
       </ol>
+
+      <h3>Advanced Topics to Explore</h3>
+      <ul>
+        <li><strong>Signals:</strong> Respond to model events automatically</li>
+        <li><strong>Caching:</strong> Redis and Memcached for performance</li>
+        <li><strong>Celery:</strong> Background tasks and job queues</li>
+        <li><strong>WebSockets:</strong> Real-time features with Django Channels</li>
+        <li><strong>GraphQL:</strong> Alternative to REST with Graphene-Django</li>
+        <li><strong>Custom User Model:</strong> Extend the built-in User model</li>
+        <li><strong>Multi-tenancy:</strong> Multiple customers on one instance</li>
+      </ul>
 
       <h3>Useful Resources</h3>
       <ul>

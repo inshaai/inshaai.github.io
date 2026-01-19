@@ -6,7 +6,7 @@
     "tags": ["web-development", "python", "django"],
     "excerpt": "Comprehensive Django tutorial covering installation, project structure, models, views, templates, forms, authentication, and more.",
     "url": "./posts/2026-01-18-django-tutorial/",
-    "readingTime": 60
+    "readingTime": 90
   },
   {
     "id": "support-vector-machines",
